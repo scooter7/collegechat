@@ -2,6 +2,10 @@ import streamlit as st
 import requests
 import google.generativeai as genai
 
+# Initialize session state for chat history if it doesn't exist
+if 'chat_history' not in st.session_state:
+    st.session_state['chat_history'] = []
+
 # Configure Google API using Streamlit's secrets management
 genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
 
@@ -52,8 +56,6 @@ st.header('Ask the AI Chatbot')
 question = st.text_input("What would you like to know about colleges?")
 if st.button('Ask AI Chatbot'):
     if question:
-        if 'chat_history' not in st.session_state:
-            st.session_state['chat_history'] = []
         response = get_response(question)
         st.session_state['chat_history'].append(("You", question))
         st.session_state['chat_history'].append(("Bot", response))
