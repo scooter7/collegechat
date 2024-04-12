@@ -2,22 +2,22 @@ import streamlit as st
 import requests
 import google.generativeai as genai
 
-# Initialize Google Gemini with API Key
 genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
 
-# List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
 def is_query_allowed(query):
-    """Check if the query contains any banned keywords."""
     query_words = query.lower().split()
     return not any(keyword in query_words for keyword in banned_keywords)
 
 def interpret_query(query):
     model = genai.GenerativeModel("gemini-pro")
     chat = model.start_chat(history=[])
-    response = chat.send_message(query)
-    return response.text.strip()
+    try:
+        response = chat.send_message(query)
+        return response.text.strip()
+    except genai.StopCandidateException:
+        return "I'm unable to process your query due to content restrictions. Please modify your query."
 
 def fetch_college_data(keyword):
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
@@ -41,11 +41,14 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             interpreted_query = interpret_query(query)
-            results = fetch_college_data(interpreted_query)
-            if results:
-                for college in results:
-                    st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            if interpreted_query == "I'm unable to process your query due to content restrictions. Please modify your query.":
+                st.error(interpreted_query)
             else:
-                st.write("No results found for your query. Please check the name or try a different query.")
+                results = fetch_college_data(interpreted_query)
+                if results:
+                    for college in results:
+                        st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+                else:
+                    st.write("No results found for your query. Please check the name or try a different query.")
     else:
         st.error("Please enter a query.")
