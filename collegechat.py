@@ -17,10 +17,7 @@ def interpret_query(query):
     model = genai.GenerativeModel("gemini-pro")
     chat = model.start_chat(history=[])
     response = chat.send_message(query)
-    if response.text.strip():
-        return response.text.strip()
-    else:
-        return "Please refine your query."
+    return response.text.strip()
 
 # Function to fetch data from the College Scorecard API
 def fetch_college_data(keyword):
@@ -44,14 +41,11 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             gemini_response = interpret_query(query)
-            if gemini_response == "Please refine your query.":
-                st.error(gemini_response)
+            results = fetch_college_data(gemini_response)
+            if results:
+                for college in results:
+                    st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
             else:
-                results = fetch_college_data(gemini_response)
-                if results:
-                    for college in results:
-                        st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-                else:
-                    st.write("No results found. Please check your query or try asking about another college.")
+                st.write("No results found. Please refine your query or try asking about another college.")
     else:
         st.error("Please enter a query.")
