@@ -28,9 +28,14 @@ def fetch_college_data(keyword):
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     response = requests.get(url, params=params)
-    if response.status_code == 200 and response.json().get('results'):
-        return response.json().get('results', [])
-    return None
+    if response.status_code == 200:
+        results = response.json().get('results')
+        if results:
+            return results
+        else:
+            st.error("No college data found for this query.")
+    else:
+        st.error(f"Failed to fetch college data: {response.status_code} {response.text}")
 
 st.title('College Information Assistant')
 query = st.text_input("Ask about colleges:")
