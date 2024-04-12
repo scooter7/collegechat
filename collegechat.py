@@ -27,12 +27,27 @@ def get_college_data(name):
         return []
 
 # Function to ask questions to Google's Gemini Pro via LangChain
-def ask_google(question):
-    google_api_key = st.secrets["google_gen_ai"]["api_key"]
-    model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key, temperature=0.3)
-    response = model.generate(messages=[{"role": "user", "content": question}])
-    print("API Response:", response)  # Use for debugging, remove or disable in production
-    return response.text.strip()
+def ask_google(context, question):
+    try:
+        google_api_key = st.secrets["google_gen_ai"]["api_key"]
+        genai.configure(api_key=google_api_key)  # Make sure genai is properly configured
+        model = ChatGoogleGenerativeAI(model="gemini-pro", client=genai, temperature=0.3)
+        prompt_template = """
+        Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+        provided context just say, 'answer is not available in the context', don't provide the wrong answer\n\n
+        Context:\n {context}?\n
+        Question: \n{question}\n
+
+        Answer:
+        """
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+        chain = load_qa_chain(llm=model, chain_type="stuff", prompt=prompt)
+        response = chain.run(context=context, question=question)
+        return response.get("answer", "No answer provided")
+    except Exception as e:
+        st.error("Failed to generate response from the AI model.")
+        st.error(f"Error: {e}")
+        return ""
 
 st.title('College Information Hub')
 
