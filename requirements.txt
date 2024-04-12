@@ -1,6 +1,6 @@
 streamlit
 requests
-google-generativeai
-langchain
 python-dotenv
+joblib
+google-generativeai
 langchain_google_genai
