@@ -1,31 +1,44 @@
 import streamlit as st
 import requests
+import google.generativeai as genai
 
-# Define keywords or topics related to the College Scorecard data
-allowed_topics = ['admission', 'tuition', 'graduation rate', 'financial aid', 'student population']
+# Initialize Google Gemini with API Key
+genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
 
-def is_query_relevant(query):
-    """Check if the query contains allowed keywords."""
-    return any(topic in query.lower() for topic in allowed_topics)
+# Example of a function to use Google Gemini
+def interpret_query(query):
+    model = genai.GenerativeModel("gemini-pro")
+    chat = model.start_chat(history=[])
+    response = chat.send_message(query)
+    return response
 
-def fetch_college_scorecard_data(query):
-    """Simulated function to fetch data from College Scorecard."""
-    # This could be an API call or a database query depending on your setup
-    return "Simulated response based on College Scorecard data."
+# Function to fetch data from the College Scorecard API
+def fetch_college_data(keyword):
+    url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
+    params = {
+        'api_key': st.secrets["college_scorecard"]["api_key"],
+        'school.name': keyword,
+        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json().get('results', [])
+    return None
 
-def ask_gemini(query):
-    """Ask a Gemini model and return the response."""
-    # Assuming you have a function to send queries to the Gemini model
-    return "Response from Gemini based on the query."
-
-st.title("College Information Assistant")
-user_query = st.text_input("Ask me about college statistics:")
+st.title('College Information Assistant')
+query = st.text_input("Ask about colleges:")
 
 if st.button("Ask"):
-    if is_query_relevant(user_query):
-        # Fetch data directly related to College Scorecard
-        response = fetch_college_scorecard_data(user_query)
-        st.write(response)
+    if query:
+        # Interpret the query with Gemini
+        gemini_response = interpret_query(query)
+        # Assuming the response contains keywords to search
+        keyword = gemini_response.text.strip()  # Simplified assumption
+        results = fetch_college_data(keyword)
+        if results:
+            for college in results:
+                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+        else:
+            st.write("No results found for:", keyword)
     else:
-        # Optionally ask Gemini or give a predefined message
-        st.write("Please ask questions relevant to college statistics such as admission, tuition, etc.")
+        st.error("Please enter a query.")
