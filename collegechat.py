@@ -16,8 +16,15 @@ def get_college_data(name):
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     response = requests.get(url, params=params)
-    data = response.json()
-    return data['results'] if 'results' in data else []
+    if response.status_code != 200:
+        st.error(f"Failed to fetch data: {response.status_code} {response.text}")
+        return []
+    try:
+        data = response.json()
+        return data['results'] if 'results' in data else []
+    except JSONDecodeError as e:
+        st.error(f"Failed to decode JSON: {e}")
+        return []
 
 # Function to ask questions to Google's Gemini Pro via LangChain
 def ask_google(question):
