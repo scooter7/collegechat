@@ -1,68 +1,31 @@
 import streamlit as st
 import requests
-import google.generativeai as genai
 
-# Initialize session state for chat history if it doesn't exist
-if 'chat_history' not in st.session_state:
-    st.session_state['chat_history'] = []
+# Define keywords or topics related to the College Scorecard data
+allowed_topics = ['admission', 'tuition', 'graduation rate', 'financial aid', 'student population']
 
-# Configure Google API using Streamlit's secrets management
-genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
+def is_query_relevant(query):
+    """Check if the query contains allowed keywords."""
+    return any(topic in query.lower() for topic in allowed_topics)
 
-# Function to fetch college data from College Scorecard API
-def get_college_data(name):
-    url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
-    params = {
-        'api_key': st.secrets["college_scorecard"]["api_key"],
-        'school.name': name,
-        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
-    }
-    response = requests.get(url, params=params)
-    if response.status_code != 200:
-        st.error(f"Failed to fetch data: {response.status_code} {response.text}")
-        return []
-    return response.json().get('results', [])
+def fetch_college_scorecard_data(query):
+    """Simulated function to fetch data from College Scorecard."""
+    # This could be an API call or a database query depending on your setup
+    return "Simulated response based on College Scorecard data."
 
-# Start a new chat session with the Gemini model
-model = genai.GenerativeModel("gemini-pro")
-chat = model.start_chat(history=[])
+def ask_gemini(query):
+    """Ask a Gemini model and return the response."""
+    # Assuming you have a function to send queries to the Gemini model
+    return "Response from Gemini based on the query."
 
-def get_response(question):
-    # This ensures that the input is formatted as expected by the model
-    response = chat.send_message(question, stream=True)
-    full_response = ''
-    for chunk in response:
-        full_response += chunk.text + ' '
-    return full_response.strip()
+st.title("College Information Assistant")
+user_query = st.text_input("Ask me about college statistics:")
 
-st.title('College Information Hub')
-
-# College Scorecard Search
-st.header('College Scorecard Search')
-college_name = st.text_input('Enter the name of the college for data:')
-if st.button('Search Colleges'):
-    if college_name:
-        results = get_college_data(college_name)
-        if results:
-            for college in results:
-                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-        else:
-            st.write("No results found")
-    else:
-        st.error("Please enter a college name")
-
-# AI Chatbot Interface
-st.header('Ask the AI Chatbot')
-question = st.text_input("What would you like to know about colleges?")
-if st.button('Ask AI Chatbot'):
-    if question:
-        response = get_response(question)
-        st.session_state['chat_history'].append(("You", question))
-        st.session_state['chat_history'].append(("Bot", response))
+if st.button("Ask"):
+    if is_query_relevant(user_query):
+        # Fetch data directly related to College Scorecard
+        response = fetch_college_scorecard_data(user_query)
         st.write(response)
     else:
-        st.error("Please enter a question to ask the chatbot.")
-
-st.subheader("Chat History")
-for role, text in st.session_state['chat_history']:
-    st.markdown(f"**{role}:** {text}")
+        # Optionally ask Gemini or give a predefined message
+        st.write("Please ask questions relevant to college statistics such as admission, tuition, etc.")
