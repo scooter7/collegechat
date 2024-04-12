@@ -1,7 +1,10 @@
 import streamlit as st
 import requests
+import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
+
+# Assuming the google API configuration is done elsewhere or already configured as shown previously
 
 def get_college_data(name):
     url = 'http://api.data.gov/ed/collegescorecard/v1/schools'
