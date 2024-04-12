@@ -1,13 +1,12 @@
 import streamlit as st
 import requests
-import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI
-from dotenv import load_dotenv
+import google.generativeai as genai
 import os
 
-load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=api_key)
+def configure_api():
+    api_key = os.getenv("GOOGLE_API_KEY")
+    genai.configure(api_key=api_key)
 
 def get_college_data(name):
     url = 'http://api.data.gov/ed/collegescorecard/v1/schools'
@@ -20,24 +19,21 @@ def get_college_data(name):
     if response.status_code != 200:
         st.error(f"Failed to fetch data: {response.status_code} {response.text}")
         return []
-    try:
-        data = response.json()
-        return data['results'] if 'results' in data else []
-    except JSONDecodeError as e:
-        st.error(f"Failed to decode JSON: {e}")
-        return []
+    data = response.json()
+    return data['results'] if 'results' in data else []
 
 def ask_google(context, question):
-    model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=st.secrets["google_gen_ai"]["api_key"], temperature=0.3)
-    messages = [{'role': 'user', 'content': question}]
+    configure_api()
+    model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GOOGLE_API_KEY"), temperature=0.3)
+    messages = [{'role': 'user', 'content': context}, {'role': 'user', 'content': question}]
     response = model.generate(messages=messages)
     return response.text.strip()
 
 st.title('College Information Hub')
 
 st.header('College Scorecard Search')
-college_name = st.text_input('Enter the name of the college for data:', key="college_search")
-if st.button('Search Colleges', key="search_button"):
+college_name = st.text_input('Enter the name of the college for data:')
+if st.button('Search Colleges'):
     if college_name:
         results = get_college_data(college_name)
         if results:
@@ -52,9 +48,9 @@ if st.button('Search Colleges', key="search_button"):
         st.error("Please enter a college name")
 
 st.header('Ask About Colleges via AI Chatbot')
-context = st.text_area("Context for your question:", "Type the context here...")
-question = st.text_input("Your question:", "Type your question here...")
-if st.button('Ask AI Chatbot', key="ask_button"):
+context = st.text_area("Context for your question:")
+question = st.text_input("Your question:")
+if st.button('Ask AI Chatbot'):
     if context and question:
         answer = ask_google(context, question)
         st.write(answer)
