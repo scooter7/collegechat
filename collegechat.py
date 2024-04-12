@@ -28,11 +28,10 @@ def get_college_data(name):
 
 # Function to ask questions to Google's Gemini Pro via LangChain
 def ask_google(question):
-    print("Loaded API Key:", st.secrets["google_gen_ai"]["api_key"])  # Remove after testing
     google_api_key = st.secrets["google_gen_ai"]["api_key"]
-    genai.configure(api_key=google_api_key)
     model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key, temperature=0.3)
-    response = model.generate(prompt=question)
+    response = model.generate(messages=[{"role": "user", "content": question}])
+    print("API Response:", response)  # Use for debugging, remove or disable in production
     return response.text.strip()
 
 st.title('College Information Hub')
