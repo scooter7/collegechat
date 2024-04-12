@@ -2,11 +2,6 @@ import streamlit as st
 import requests
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
-import os
-
-def configure_api():
-    api_key = os.getenv("GOOGLE_API_KEY")
-    genai.configure(api_key=api_key)
 
 def get_college_data(name):
     url = 'http://api.data.gov/ed/collegescorecard/v1/schools'
@@ -22,10 +17,11 @@ def get_college_data(name):
     data = response.json()
     return data['results'] if 'results' in data else []
 
-def ask_google(context, question):
-    configure_api()
-    model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GOOGLE_API_KEY"), temperature=0.3)
-    messages = [{'role': 'user', 'content': context}, {'role': 'user', 'content': question}]
+def ask_google(question):
+    google_api_key = st.secrets["google_gen_ai"]["api_key"]
+    genai.configure(api_key=google_api_key)
+    model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=google_api_key, temperature=0.3)
+    messages = [{'role': 'user', 'content': question}]
     response = model.generate(messages=messages)
     return response.text.strip()
 
@@ -47,12 +43,11 @@ if st.button('Search Colleges'):
     else:
         st.error("Please enter a college name")
 
-st.header('Ask About Colleges via AI Chatbot')
-context = st.text_area("Context for your question:")
-question = st.text_input("Your question:")
-if st.button('Ask AI Chatbot'):
-    if context and question:
-        answer = ask_google(context, question)
+st.header('Ask the AI Chatbot')
+question = st.text_input("What would you like to know?")
+if st.button('Ask'):
+    if question:
+        answer = ask_google(question)
         st.write(answer)
     else:
-        st.error("Please provide both context and a question.")
+        st.error("Please enter a question to ask the chatbot.")
