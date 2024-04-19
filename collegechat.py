@@ -49,6 +49,6 @@ if st.button("Ask"):
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
             else:
-                st.write("", keyword)
+                st.write("Results found for:", keyword)
     else:
         st.error("Please enter a query.")
