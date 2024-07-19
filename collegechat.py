@@ -14,12 +14,12 @@ def is_query_allowed(query):
     st.write(f"Query allowed: {result}")
     return result
 
-def fetch_college_data(keyword):
-    st.write(f"Fetching college data for keyword: {keyword}...")
+def fetch_college_data(query):
+    st.write(f"Fetching college data for query: {query}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
         'api_key': st.secrets["college_scorecard"]["api_key"],
-        'school.name': keyword,
+        'school.name': query,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     response = requests.get(url, params=params)
@@ -51,6 +51,7 @@ def save_conversation_history_to_github(query, results, form_data):
     repo = g.get_repo(repo_name)
     # Create the file in the repo
     try:
+        st.write(f"Attempting to save file to GitHub: {file_name}")
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
         st.write(f"File {file_name} saved to GitHub repository {repo_name}")
     except Exception as e:
@@ -67,13 +68,15 @@ if st.button("Ask"):
         if not is_query_allowed(query):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
-            keyword = query
-            st.write(f"Using user query: {keyword}")
-            
-            results = fetch_college_data(keyword)
-            st.write(f"Results found for: {keyword}")
+            results = fetch_college_data(query)
+            if results:
+                st.write(f"Results found for: {query}")
+                for college in results:
+                    st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            else:
+                st.write(f"No results found for: {query}")
 
-            # Display the form regardless of whether results are found
+            # Always display the form regardless of the results
             st.write("Displaying form...")
             with st.form("user_details_form"):
                 st.write("Please fill out the form below to learn more about the colleges.")
@@ -85,7 +88,7 @@ if st.button("Ask"):
                 zip_code = st.text_input("5-digit Zip Code")
                 interested_schools = st.multiselect(
                     "Schools you are interested in learning more about:",
-                    [college['school.name'] for college in results] if results else []
+                    [college['school.name'] for college in results]
                 )
                 submit_button = st.form_submit_button("Submit")
 
@@ -103,7 +106,5 @@ if st.button("Ask"):
                     st.write("Form Data:", form_data)
                     save_conversation_history_to_github(query, results, form_data)
                     st.success("Your information has been submitted successfully.")
-            if not results:
-                st.write("No results found for:", keyword)
     else:
         st.error("Please enter a query.")
