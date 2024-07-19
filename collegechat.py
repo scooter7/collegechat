@@ -160,6 +160,7 @@ if submitted_query:
                 "Schools you are interested in learning more about:",
                 relevant_schools
             )
+            st.write(f"Options in multiselect: {relevant_schools}")
             submit_button = st.form_submit_button("Submit")
 
             if submit_button:
