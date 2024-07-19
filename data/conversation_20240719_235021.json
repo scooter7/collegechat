@@ -1,0 +1,17 @@
+{
+    "timestamp": "2024-07-19T23:50:21.932614",
+    "query": "graduate physics programs in Minnesota",
+    "response_text": "University of Minnesota - Twin Cities\n\n* Ph.D. in Physics\n* Master of Science (M.S.) in Physics\n\nAugsburg University\n\n* Master of Science in Applied Physics\n\nCarleton College\n\n* Bachelor of Arts (B.A.) in Physics\n* Minor in Physics\n\nHamline University\n\n* Bachelor of Arts (B.A.) in Physics\n\nMacalester College\n\n* Bachelor of Arts (B.A.) in Physics\n* Minor in Physics\n\nSaint Mary's University of Minnesota\n\n* Master of Science in Teaching Physics\n* Minor in Physics\n\nSaint Olaf College\n\n* Bachelor of Arts (B.A.) in Physics\n* Minor in Physics\n\nUniversity of Saint Thomas\n\n* Master of Science in Medical Physics\n* Minor in Physics",
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "t@est.com",
+        "dob": "2024-07-19",
+        "graduation_year": 1900,
+        "zip_code": "66688",
+        "interested_schools": [
+            "3. Cornell University Johnson Graduate School of Management",
+            "6. Fordham University Gabelli School of Business"
+        ]
+    }
+}
