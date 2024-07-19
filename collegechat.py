@@ -113,8 +113,8 @@ if submitted_query:
         relevant_schools = extract_bolded_names(response_text)
         st.write(f"Extracted bolded school names: {relevant_schools}")
 
-        # Check if relevant_schools is populated
-        st.write(f"Relevant schools: {relevant_schools}")
+        # Store the relevant schools in session state
+        st.session_state["relevant_schools"] = relevant_schools
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
@@ -127,9 +127,9 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                relevant_schools
+                st.session_state.get("relevant_schools", [])
             )
-            st.write(f"Options in multiselect: {relevant_schools}")
+            st.write(f"Options in multiselect: {st.session_state.get('relevant_schools', [])}")
             st.write(f"Selected schools before submit: {interested_schools}")
             submit_button = st.form_submit_button("Submit")
 
