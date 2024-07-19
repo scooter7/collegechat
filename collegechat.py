@@ -88,6 +88,10 @@ if st.button("Ask"):
             if not keyword:
                 keyword = "engineering"  # Fallback keyword
 
+            # Ensure the keyword is suitable for API call
+            if len(keyword.split()) > 1:
+                keyword = keyword.split()[-1]  # Use the last word as a fallback
+
             results = fetch_college_data(keyword)
             if results:
                 st.write(f"Results found for: {keyword}")
