@@ -143,7 +143,7 @@ if submitted_query:
                     "zip_code": zip_code,
                     "interested_schools": interested_schools
                 }
-                st.write("Form data: ", form_data)  # Debugging form data
+                st.write("Form data before saving: ", form_data)  # Debugging form data
 
                 # Save conversation history to GitHub
                 history = {
