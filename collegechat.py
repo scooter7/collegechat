@@ -131,6 +131,7 @@ if submitted_query:
 
             if submit_button:
                 st.write("Form submitted")
+                st.write(f"Selected schools: {interested_schools}")
                 form_data = {
                     "first_name": first_name,
                     "last_name": last_name,
