@@ -133,6 +133,10 @@ if submitted_query:
 
         results = fetch_college_data(state, keyword)
         relevant_schools = [college['school.name'] for college in results] if results else []
+        
+        # Debugging to check the relevant_schools
+        st.write(f"Relevant schools extracted: {relevant_schools}")
+
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
