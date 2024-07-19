@@ -38,11 +38,14 @@ def interpret_query(query):
     return response
 
 def extract_bolded_names(text):
-    # Use regex to find all occurrences of bolded names
+    # Simplified approach to find all bolded names
     st.write(f"Extracting bolded names from response text: {text}")
-    bolded_names = re.findall(r'\*\*([\w\s]+(?:University|College|Institute|School of Nursing))\*\*', text)
-    st.write(f"Bolded names extracted: {bolded_names}")
-    return bolded_names
+    bolded_names = re.findall(r'\*\*(.*?)\*\*', text)
+    # Filter out non-college/university names
+    college_keywords = ['University', 'College', 'Institute', 'School of Nursing']
+    filtered_names = [name for name in bolded_names if any(keyword in name for keyword in college_keywords)]
+    st.write(f"Filtered bolded names: {filtered_names}")
+    return filtered_names
 
 def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
