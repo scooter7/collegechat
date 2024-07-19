@@ -64,9 +64,9 @@ if st.button("Ask"):
         if not is_query_allowed(query):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
-            # Skip the Google Gemini interpretation and use the query directly
-            keyword = query
-            st.write(f"Query interpreted as: {keyword}")
+            # Use a known keyword to ensure results
+            keyword = "engineering"
+            st.write(f"Using test keyword: {keyword}")
             
             results = fetch_college_data(keyword)
             if results:
