@@ -71,9 +71,6 @@ def save_conversation_history_to_github(query, results, form_data):
 st.title('College Information Assistant')
 query = st.text_input("Ask about colleges:")
 
-if 'form_data' not in st.session_state:
-    st.session_state.form_data = None
-
 if st.button("Ask"):
     st.write("Ask button clicked")
     if query:
@@ -120,7 +117,7 @@ if st.button("Ask"):
 
                     if submit_button:
                         st.write("Form submitted")
-                        st.session_state.form_data = {
+                        form_data = {
                             "first_name": first_name,
                             "last_name": last_name,
                             "email": email,
@@ -129,8 +126,8 @@ if st.button("Ask"):
                             "zip_code": zip_code,
                             "interested_schools": interested_schools
                         }
-                        st.write("Form data: ", st.session_state.form_data)  # Debugging form data
-                        save_conversation_history_to_github(query, results, st.session_state.form_data)
+                        st.write("Form data: ", form_data)  # Debugging form data
+                        save_conversation_history_to_github(query, results, form_data)
                         st.success("Your information has been submitted successfully.")
             else:
                 st.write("No results found for:", keyword)
