@@ -1,0 +1,33 @@
+{
+    "timestamp": "2024-07-19T18:04:53.135489",
+    "query": "dental schools in Texas",
+    "results": [
+        {
+            "school.name": "Stanford University",
+            "school.city": "Stanford",
+            "school.state": "CA"
+        },
+        {
+            "school.name": "California Institute of Technology",
+            "school.city": "Pasadena",
+            "school.state": "CA"
+        },
+        {
+            "school.name": "University of California, Berkeley",
+            "school.city": "Berkeley",
+            "school.state": "CA"
+        }
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "t@est.org",
+        "dob": "2024-07-19",
+        "graduation_year": 1900,
+        "zip_code": "11111",
+        "interested_schools": [
+            "California Institute of Technology",
+            "University of California, Berkeley"
+        ]
+    }
+}
