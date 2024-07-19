@@ -104,6 +104,7 @@ if st.button("Ask"):
                         "interested_schools": interested_schools
                     }
                     st.write("Form Data:", form_data)
+                    st.write("Attempting to save the data to GitHub...")
                     save_conversation_history_to_github(query, results, form_data)
                     st.success("Your information has been submitted successfully.")
     else:
