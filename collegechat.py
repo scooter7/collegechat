@@ -49,7 +49,7 @@ def fetch_college_data(state, keyword):
     }
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
-    st.write(f"Response content: {response.text}")  # Debug the response content
+    st.write(f"Response content: {response.json()}")  # Debug the response content
     if response.status_code == 200:
         results = response.json().get('results', [])
         st.write(f"College Scorecard API results: {results}")
