@@ -13,22 +13,23 @@ genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
 def is_query_allowed(query):
-    # Check if the query contains any banned keywords
     st.write("Checking if the query contains banned keywords...")
     result = not any(keyword in query.lower() for keyword in banned_keywords)
     st.write(f"Query allowed: {result}")
     return result
 
-# Example of a function to use Google Gemini
 def interpret_query(query):
     st.write("Interpreting query with Google Gemini...")
-    model = genai.GenerativeModel("gemini-pro")
-    chat = model.start_chat(history=[])
-    response = chat.send_message(query)
-    st.write(f"Google Gemini response: {response.text}")
-    return response
+    try:
+        model = genai.GenerativeModel("gemini-pro")
+        chat = model.start_chat(history=[])
+        response = chat.send_message(query)
+        st.write(f"Google Gemini response: {response.text}")
+        return response.text.strip()
+    except Exception as e:
+        st.write(f"Error during query interpretation: {e}")
+        return query
 
-# Function to fetch data from the College Scorecard API
 def fetch_college_data(keyword):
     st.write(f"Fetching college data for keyword: {keyword}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
@@ -80,9 +81,7 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             # Interpret the query with Gemini
-            gemini_response = interpret_query(query)
-            # Assuming the response contains keywords to search
-            keyword = gemini_response.text.strip()  # Simplified assumption
+            keyword = interpret_query(query)
             st.write(f"Query interpreted as: {keyword}")
             
             results = fetch_college_data(keyword)
