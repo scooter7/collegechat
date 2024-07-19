@@ -146,5 +146,6 @@ if submitted_query:
                     "response_text": response_text,
                     "form_data": form_data
                 }
+                st.write(f"History to be saved: {history}")  # Debugging history data
                 save_conversation_history_to_github(history)
                 st.success("Your information has been submitted successfully.")
