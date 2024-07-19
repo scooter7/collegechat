@@ -38,8 +38,8 @@ def interpret_query(query):
     return response
 
 def extract_bolded_names(text):
-    # Use regex to find all occurrences of bolded names
-    bolded_names = re.findall(r'\*\*(.*?)\*\*', text)
+    # Refine regex to match college and university names only
+    bolded_names = re.findall(r'\*\*([\w\s]+(?:University|College|Institute|School of Nursing))\*\*', text)
     return bolded_names
 
 def save_conversation_history_to_github(history):
