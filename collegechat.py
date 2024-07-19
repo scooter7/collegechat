@@ -58,15 +58,8 @@ def fetch_college_data(state, keyword):
         st.write(f"Response: {response.text}")
     return []
 
-def save_conversation_history_to_github(query, results, form_data):
+def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
-    history = {
-        "timestamp": datetime.now().isoformat(),
-        "query": query,
-        "results": results,
-        "form_data": form_data
-    }
-    
     file_content = json.dumps(history, indent=4)
     file_name = f"conversation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     repo_name = "scooter7/collegechat"  # Replace with your repository name
@@ -101,73 +94,86 @@ def save_conversation_history_to_github(query, results, form_data):
 
 # Streamlit app UI
 st.title('College Information Assistant')
+
 query = st.text_input("Ask about colleges:")
+submitted_query = st.session_state.get('submitted_query', '')
 
 if st.button("Ask"):
-    st.write("Ask button clicked")
     if query:
-        st.write(f"User query: {query}")
-        if not is_query_allowed(query):
-            st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
-        else:
-            # Interpret the query with Gemini
-            try:
-                gemini_response = interpret_query(query)
-                keyword = gemini_response.text.strip()  # Simplified assumption
-                st.write(f"Using keyword from Gemini: {keyword}")
-            except Exception as e:
-                st.write(f"Error interacting with Gemini: {e}")
-                keyword = "engineering"  # Fallback keyword
-            
-            if not keyword:
-                keyword = "engineering"  # Fallback keyword
+        st.session_state['submitted_query'] = query
+        submitted_query = query
 
-            # Extract the state and keyword from the user query
-            state = ""
-            if "in" in query:
-                parts = re.split(r'\bin\b', query)
-                keyword = parts[0].strip()
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-                else:
-                    state = ""
+if submitted_query:
+    st.write(f"User query: {submitted_query}")
+    if not is_query_allowed(submitted_query):
+        st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
+    else:
+        # Interpret the query with Gemini
+        try:
+            gemini_response = interpret_query(submitted_query)
+            keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using keyword from Gemini: {keyword}")
+        except Exception as e:
+            st.write(f"Error interacting with Gemini: {e}")
+            keyword = "engineering"  # Fallback keyword
 
-            results = fetch_college_data(state, keyword)
-            relevant_schools = [college['school.name'] for college in results] if results else []
-            if results:
-                st.write(f"Results found for: {keyword} in {state}")
-                for college in results:
-                    st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+        if not keyword:
+            keyword = "engineering"  # Fallback keyword
+
+        # Extract the state and keyword from the user query
+        state = ""
+        if "in" in submitted_query:
+            parts = re.split(r'\bin\b', submitted_query)
+            keyword = parts[0].strip()
+            state_match = re.search(r'\b(\w{2})\b', parts[1])
+            if state_match:
+                state = state_match.group(1).upper()
             else:
-                st.write(f"No results found for: {keyword}")
+                state = ""
 
-            # Display form regardless of results
-            with st.form(key="user_details_form"):
-                st.write("Please fill out the form below to learn more about the colleges.")
-                first_name = st.text_input("First Name")
-                last_name = st.text_input("Last Name")
-                email = st.text_input("Email Address")
-                dob = st.date_input("Date of Birth")
-                graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-                zip_code = st.text_input("5-digit Zip Code")
-                interested_schools = st.multiselect(
-                    "Schools you are interested in learning more about:",
-                    relevant_schools
-                )
-                submit_button = st.form_submit_button("Submit")
+        results = fetch_college_data(state, keyword)
+        relevant_schools = [college['school.name'] for college in results] if results else []
+        if results:
+            st.write(f"Results found for: {keyword} in {state}")
+            for college in results:
+                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+        else:
+            st.write(f"No results found for: {keyword}")
 
-                if submit_button:
-                    st.write("Form submitted")
-                    form_data = {
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "email": email,
-                        "dob": dob.strftime("%Y-%m-%d"),
-                        "graduation_year": graduation_year,
-                        "zip_code": zip_code,
-                        "interested_schools": interested_schools
-                    }
-                    st.write("Form data: ", form_data)  # Debugging form data
-                    save_conversation_history_to_github(query, results, form_data)
-                    st.success("Your information has been submitted successfully.")
+        # Display form regardless of results
+        with st.form(key="user_details_form"):
+            st.write("Please fill out the form below to learn more about the colleges.")
+            first_name = st.text_input("First Name")
+            last_name = st.text_input("Last Name")
+            email = st.text_input("Email Address")
+            dob = st.date_input("Date of Birth")
+            graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+            zip_code = st.text_input("5-digit Zip Code")
+            interested_schools = st.multiselect(
+                "Schools you are interested in learning more about:",
+                relevant_schools
+            )
+            submit_button = st.form_submit_button("Submit")
+
+            if submit_button:
+                st.write("Form submitted")
+                form_data = {
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "dob": dob.strftime("%Y-%m-%d"),
+                    "graduation_year": graduation_year,
+                    "zip_code": zip_code,
+                    "interested_schools": interested_schools
+                }
+                st.write("Form data: ", form_data)  # Debugging form data
+
+                # Save conversation history to GitHub
+                history = {
+                    "timestamp": datetime.now().isoformat(),
+                    "query": submitted_query,
+                    "results": results,
+                    "form_data": form_data
+                }
+                save_conversation_history_to_github(history)
+                st.success("Your information has been submitted successfully.")
