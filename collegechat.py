@@ -151,25 +151,25 @@ with st.form(key="user_details_form"):
     st.write(f"Selected schools before submit: {interested_schools}")
     submit_button = st.form_submit_button("Submit")
 
-if submit_button:
-    st.write("Form submitted")
-    st.write(f"Selected schools after submit: {interested_schools}")
-    form_data = {
-        "first_name": first_name,
-        "last_name": last_name,
-        "email": email,
-        "dob": dob.strftime("%Y-%m-%d"),
-        "graduation_year": graduation_year,
-        "zip_code": zip_code,
-        "interested_schools": interested_schools
-    }
-    st.write("Form data before saving: ", form_data)  # Debugging form data
+    if submit_button:
+        st.write("Form submitted")
+        st.write(f"Selected schools after submit: {interested_schools}")
+        form_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "dob": dob.strftime("%Y-%m-%d"),
+            "graduation_year": graduation_year,
+            "zip_code": zip_code,
+            "interested_schools": interested_schools
+        }
+        st.write("Form data before saving: ", form_data)  # Debugging form data
 
-    # Save form_data in session state
-    st.session_state["form_data"] = form_data
+        # Save form_data in session state
+        st.session_state["form_data"] = form_data
 
-    # Display form data for debugging purposes
-    st.json(form_data)
+        # Display form data for debugging purposes
+        st.json(form_data)
 
 # Add a button to save the conversation history to GitHub for testing purposes
 if st.button("Save to GitHub"):
