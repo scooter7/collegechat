@@ -106,8 +106,8 @@ if st.button("Ask"):
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
 
                 # Display form directly for debugging
+                st.write("Displaying form below to learn more about the colleges.")  # Added debug information
                 with st.form(key="user_details_form"):
-                    st.write("Please fill out the form below to learn more about the colleges.")
                     first_name = st.text_input("First Name")
                     last_name = st.text_input("Last Name")
                     email = st.text_input("Email Address")
