@@ -144,5 +144,3 @@ if st.button("Ask"):
                     st.write("Form data: ", form_data)  # Debugging form data
                     save_conversation_history_to_github(query, results, form_data)
                     st.success("Your information has been submitted successfully.")
-    else:
-        st.error("Please enter a query.")
