@@ -61,16 +61,18 @@ def save_conversation_history_to_github(query, results, form_data):
     try:
         g = Github(st.secrets["github"]["token"])
         repo = g.get_repo(repo_name)
+        st.write(f"Authenticated to GitHub repository: {repo_name}")
+
         # Check if the folder exists
         contents = repo.get_contents(folder_path)
-        if not contents:
-            st.write(f"Folder {folder_path} does not exist in the repository {repo_name}. Please create it first.")
-            return
+        st.write(f"Contents of folder '{folder_path}': {contents}")
+
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
         st.write(f"File {file_name} saved to GitHub repository {repo_name}")
     except Exception as e:
         st.write(f"Failed to save file to GitHub: {e}")
+        st.write("Detailed error:", e)
 
 # Streamlit app UI
 st.title('College Information Assistant')
