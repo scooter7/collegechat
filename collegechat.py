@@ -65,16 +65,20 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             # Interpret the query with Gemini
+            st.write("Interpreting query...")
             gemini_response = interpret_query(query)
             # Assuming the response contains keywords to search
             keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Query interpreted as: {keyword}")
+            
             results = fetch_college_data(keyword)
             if results:
-                st.write("Results found for:", keyword)
+                st.write(f"Results found for: {keyword}")
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
 
                 # Create form after displaying the results
+                st.write("Displaying form...")
                 with st.form("user_details_form"):
                     st.write("Please fill out the form below to learn more about the colleges.")
                     first_name = st.text_input("First Name")
