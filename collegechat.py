@@ -4,6 +4,7 @@ import google.generativeai as genai
 from datetime import datetime
 import json
 from github import Github
+import re
 
 # Initialize Google Gemini with API Key
 genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
@@ -97,47 +98,51 @@ if st.button("Ask"):
             # Extract the state and keyword from the user query
             state = ""
             if "in" in query:
-                parts = query.split("in")
+                parts = re.split(r'\bin\b', query)
                 keyword = parts[0].strip()
-                state = parts[1].strip().split()[0].upper()  # Simplified assumption for state extraction
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
+                else:
+                    state = ""
 
             results = fetch_college_data(state, keyword)
+            relevant_schools = [college['school.name'] for college in results] if results else []
             if results:
                 st.write(f"Results found for: {keyword} in {state}")
-                relevant_schools = [college['school.name'] for college in results]
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-
-                # Display form directly for debugging
-                with st.form(key="user_details_form"):
-                    st.write("Please fill out the form below to learn more about the colleges.")
-                    first_name = st.text_input("First Name")
-                    last_name = st.text_input("Last Name")
-                    email = st.text_input("Email Address")
-                    dob = st.date_input("Date of Birth")
-                    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-                    zip_code = st.text_input("5-digit Zip Code")
-                    interested_schools = st.multiselect(
-                        "Schools you are interested in learning more about:",
-                        relevant_schools
-                    )
-                    submit_button = st.form_submit_button("Submit")
-
-                    if submit_button:
-                        st.write("Form submitted")
-                        form_data = {
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "email": email,
-                            "dob": dob.strftime("%Y-%m-%d"),
-                            "graduation_year": graduation_year,
-                            "zip_code": zip_code,
-                            "interested_schools": interested_schools
-                        }
-                        st.write("Form data: ", form_data)  # Debugging form data
-                        save_conversation_history_to_github(query, results, form_data)
-                        st.success("Your information has been submitted successfully.")
             else:
-                st.write("No results found for:", keyword)
+                st.write(f"No results found for: {keyword}")
+
+            # Display form regardless of results
+            with st.form(key="user_details_form"):
+                st.write("Please fill out the form below to learn more about the colleges.")
+                first_name = st.text_input("First Name")
+                last_name = st.text_input("Last Name")
+                email = st.text_input("Email Address")
+                dob = st.date_input("Date of Birth")
+                graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+                zip_code = st.text_input("5-digit Zip Code")
+                interested_schools = st.multiselect(
+                    "Schools you are interested in learning more about:",
+                    relevant_schools
+                )
+                submit_button = st.form_submit_button("Submit")
+
+                if submit_button:
+                    st.write("Form submitted")
+                    form_data = {
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "email": email,
+                        "dob": dob.strftime("%Y-%m-%d"),
+                        "graduation_year": graduation_year,
+                        "zip_code": zip_code,
+                        "interested_schools": interested_schools
+                    }
+                    st.write("Form data: ", form_data)  # Debugging form data
+                    save_conversation_history_to_github(query, results, form_data)
+                    st.success("Your information has been submitted successfully.")
     else:
         st.error("Please enter a query.")
