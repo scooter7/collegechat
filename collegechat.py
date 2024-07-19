@@ -61,11 +61,14 @@ def save_conversation_history_to_github(query, results, form_data):
     try:
         g = Github(st.secrets["github"]["token"])
         repo = g.get_repo(repo_name)
+        st.write(f"Authenticated to GitHub repository: {repo_name}")
+
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
         st.write(f"File {file_name} saved to GitHub repository {repo_name}")
     except Exception as e:
         st.write(f"Failed to save file to GitHub: {e}")
+        st.write(f"Error details: {e}")
 
 # Streamlit app UI
 st.title('College Information Assistant')
@@ -97,6 +100,7 @@ if st.button("Ask"):
             results = fetch_college_data(keyword)
             if results:
                 st.write(f"Results found for: {keyword}")
+                relevant_schools = [college['school.name'] for college in results]
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
 
@@ -111,7 +115,7 @@ if st.button("Ask"):
                     zip_code = st.text_input("5-digit Zip Code")
                     interested_schools = st.multiselect(
                         "Schools you are interested in learning more about:",
-                        [college['school.name'] for college in results]
+                        relevant_schools
                     )
                     submit_button = st.form_submit_button("Submit")
 
