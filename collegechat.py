@@ -52,6 +52,9 @@ with st.form(key="user_details_form"):
         }
         st.write("Form data before saving: ", form_data)  # Debugging form data
 
+        # Save form_data in session state
+        st.session_state["form_data"] = form_data
+
         # Display form data for debugging purposes
         st.json(form_data)
 
