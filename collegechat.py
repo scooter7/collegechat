@@ -6,7 +6,7 @@ import json
 from github import Github
 import re
 
-# Initialize Google Gemini with API Key
+# Initialize API keys from Streamlit secrets
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
 github_token = st.secrets.get("github", {}).get("token", None)
@@ -118,6 +118,8 @@ if submitted_query:
             gemini_response = interpret_query(submitted_query)
             response_text = gemini_response.text
             st.write(f"Response from Gemini:\n{response_text}")  # Debug the raw response text
+            # Store the response text in session state
+            st.session_state['response_text'] = response_text
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
             response_text = ""
