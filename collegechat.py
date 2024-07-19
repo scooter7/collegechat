@@ -50,8 +50,11 @@ def save_conversation_history_to_github(query, results, form_data):
     g = Github(st.secrets["github"]["token"])
     repo = g.get_repo(repo_name)
     # Create the file in the repo
-    repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
-    st.write(f"File {file_name} saved to GitHub repository {repo_name}")
+    try:
+        repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
+        st.write(f"File {file_name} saved to GitHub repository {repo_name}")
+    except Exception as e:
+        st.write(f"Error saving file to GitHub: {e}")
 
 # Streamlit app UI
 st.title('College Information Assistant')
@@ -64,9 +67,8 @@ if st.button("Ask"):
         if not is_query_allowed(query):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
-            # Use a known keyword to ensure results
-            keyword = "engineering"
-            st.write(f"Using test keyword: {keyword}")
+            keyword = query
+            st.write(f"Using user query: {keyword}")
             
             results = fetch_college_data(keyword)
             if results:
