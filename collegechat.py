@@ -101,6 +101,7 @@ if st.button("Ask"):
                             "zip_code": zip_code,
                             "interested_schools": interested_schools
                         }
+                        st.write("Form Data:", form_data)
                         save_conversation_history_to_github(query, results, form_data)
                         st.success("Your information has been submitted successfully.")
             else:
