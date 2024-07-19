@@ -1,13 +1,9 @@
 import streamlit as st
 import requests
-import google.generativeai as genai
 from datetime import datetime
 import json
 import os
 from github import Github
-
-# Initialize Google Gemini with API Key
-genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
 
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
@@ -17,18 +13,6 @@ def is_query_allowed(query):
     result = not any(keyword in query.lower() for keyword in banned_keywords)
     st.write(f"Query allowed: {result}")
     return result
-
-def interpret_query(query):
-    st.write("Interpreting query with Google Gemini...")
-    try:
-        model = genai.GenerativeModel("gemini-pro")
-        chat = model.start_chat(history=[])
-        response = chat.send_message(query)
-        st.write(f"Google Gemini response: {response.text}")
-        return response.text.strip()
-    except Exception as e:
-        st.write(f"Error during query interpretation: {e}")
-        return query
 
 def fetch_college_data(keyword):
     st.write(f"Fetching college data for keyword: {keyword}...")
@@ -80,8 +64,8 @@ if st.button("Ask"):
         if not is_query_allowed(query):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
-            # Interpret the query with Gemini
-            keyword = interpret_query(query)
+            # Skip the Google Gemini interpretation and use the query directly
+            keyword = query
             st.write(f"Query interpreted as: {keyword}")
             
             results = fetch_college_data(keyword)
