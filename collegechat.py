@@ -71,42 +71,39 @@ if st.button("Ask"):
             st.write(f"Using user query: {keyword}")
             
             results = fetch_college_data(keyword)
-            if results:
-                st.write(f"Results found for: {keyword}")
-                for college in results:
-                    st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            st.write(f"Results found for: {keyword}")
 
-                # Create form after displaying the results
-                st.write("Displaying form...")
-                with st.form("user_details_form"):
-                    st.write("Please fill out the form below to learn more about the colleges.")
-                    first_name = st.text_input("First Name")
-                    last_name = st.text_input("Last Name")
-                    email = st.text_input("Email Address")
-                    dob = st.date_input("Date of Birth")
-                    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-                    zip_code = st.text_input("5-digit Zip Code")
-                    interested_schools = st.multiselect(
-                        "Schools you are interested in learning more about:",
-                        [college['school.name'] for college in results]
-                    )
-                    submit_button = st.form_submit_button("Submit")
+            # Display the form regardless of whether results are found
+            st.write("Displaying form...")
+            with st.form("user_details_form"):
+                st.write("Please fill out the form below to learn more about the colleges.")
+                first_name = st.text_input("First Name")
+                last_name = st.text_input("Last Name")
+                email = st.text_input("Email Address")
+                dob = st.date_input("Date of Birth")
+                graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+                zip_code = st.text_input("5-digit Zip Code")
+                interested_schools = st.multiselect(
+                    "Schools you are interested in learning more about:",
+                    [college['school.name'] for college in results] if results else []
+                )
+                submit_button = st.form_submit_button("Submit")
 
-                    if submit_button:
-                        st.write("Form submitted")
-                        form_data = {
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "email": email,
-                            "dob": dob.strftime("%Y-%m-%d"),
-                            "graduation_year": graduation_year,
-                            "zip_code": zip_code,
-                            "interested_schools": interested_schools
-                        }
-                        st.write("Form Data:", form_data)
-                        save_conversation_history_to_github(query, results, form_data)
-                        st.success("Your information has been submitted successfully.")
-            else:
+                if submit_button:
+                    st.write("Form submitted")
+                    form_data = {
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "email": email,
+                        "dob": dob.strftime("%Y-%m-%d"),
+                        "graduation_year": graduation_year,
+                        "zip_code": zip_code,
+                        "interested_schools": interested_schools
+                    }
+                    st.write("Form Data:", form_data)
+                    save_conversation_history_to_github(query, results, form_data)
+                    st.success("Your information has been submitted successfully.")
+            if not results:
                 st.write("No results found for:", keyword)
     else:
         st.error("Please enter a query.")
