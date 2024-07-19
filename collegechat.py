@@ -25,11 +25,12 @@ def interpret_query(query):
     return response
 
 # Function to fetch data from the College Scorecard API
-def fetch_college_data(keyword):
-    st.write(f"Fetching college data for keyword: {keyword}...")
+def fetch_college_data(state, keyword):
+    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
         'api_key': st.secrets["college_scorecard"]["api_key"],
+        'school.state': state,
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
@@ -93,13 +94,16 @@ if st.button("Ask"):
             if not keyword:
                 keyword = "engineering"  # Fallback keyword
 
-            # Ensure the keyword is suitable for API call
-            if len(keyword.split()) > 1:
-                keyword = keyword.split()[-1]  # Use the last word as a fallback
+            # Extract the state and keyword from the user query
+            state = ""
+            if "in" in query:
+                parts = query.split("in")
+                keyword = parts[0].strip()
+                state = parts[1].strip().split()[0].upper()  # Simplified assumption for state extraction
 
-            results = fetch_college_data(keyword)
+            results = fetch_college_data(state, keyword)
             if results:
-                st.write(f"Results found for: {keyword}")
+                st.write(f"Results found for: {keyword} in {state}")
                 relevant_schools = [college['school.name'] for college in results]
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
