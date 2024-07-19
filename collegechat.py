@@ -77,10 +77,17 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             # Interpret the query with Gemini
-            gemini_response = interpret_query(query)
-            keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
+            try:
+                gemini_response = interpret_query(query)
+                keyword = gemini_response.text.strip()  # Simplified assumption
+                st.write(f"Using keyword from Gemini: {keyword}")
+            except Exception as e:
+                st.write(f"Error interacting with Gemini: {e}")
+                keyword = "engineering"  # Fallback keyword
             
+            if not keyword:
+                keyword = "engineering"  # Fallback keyword
+
             results = fetch_college_data(keyword)
             if results:
                 st.write(f"Results found for: {keyword}")
