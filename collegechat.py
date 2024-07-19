@@ -37,35 +37,10 @@ def interpret_query(query):
     response = chat.send_message(query)
     return response
 
-# Function to fetch data from the College Scorecard API
-def fetch_college_data(state, keyword):
-    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
-    url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
-    params = {
-        'api_key': college_scorecard_api_key,
-        'school.state': state,
-        'school.name': keyword,
-        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
-    }
-    response = requests.get(url, params=params)
-    st.write(f"College Scorecard API response status code: {response.status_code}")
-    
-    # Check if the response contains JSON data
-    try:
-        response_data = response.json()
-        st.write(f"Response JSON data: {response_data}")
-    except ValueError:
-        st.write("Failed to parse JSON from College Scorecard API response")
-        return []
-    
-    # Check if the 'results' key exists and contains data
-    if 'results' in response_data:
-        results = response_data['results']
-        st.write(f"College Scorecard API results: {results}")
-        return results
-    else:
-        st.write("No 'results' key in the College Scorecard API response")
-        return []
+def extract_bolded_names(text):
+    # Use regex to find all occurrences of bolded names
+    bolded_names = re.findall(r'\*\*(.*?)\*\*', text)
+    return bolded_names
 
 def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
@@ -120,41 +95,20 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
-            keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
+            response_text = gemini_response.text
+            st.write(f"Response from Gemini: {response_text}")
+            keyword = "engineering"  # Use the keyword to fetch data; fallback in case no extraction
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
+            response_text = ""
             keyword = "engineering"  # Fallback keyword
 
-        if not keyword:
-            keyword = "engineering"  # Fallback keyword
+        if not response_text:
+            response_text = "No response text available."
 
-        # Extract the state and keyword from the user query
-        state = ""
-        keyword = submitted_query.strip()
-        if "in" in submitted_query:
-            parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip() if len(parts) > 0 else submitted_query.strip()
-            if len(parts) > 1:
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-
-        st.write(f"Extracted keyword: {keyword}")
-        st.write(f"Extracted state: {state}")
-
-        results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results]
-
-        # Debugging to check the relevant_schools
-        st.write(f"Relevant schools extracted: {relevant_schools}")
-
-        if results:
-            st.write(f"Results found for: {keyword} in {state}")
-            for college in results:
-                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}")
-        else:
-            st.write(f"No results found for: {keyword}")
+        # Extract bolded names from the response text
+        relevant_schools = extract_bolded_names(response_text)
+        st.write(f"Extracted bolded school names: {relevant_schools}")
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
@@ -189,7 +143,7 @@ if submitted_query:
                 history = {
                     "timestamp": datetime.now().isoformat(),
                     "query": submitted_query,
-                    "results": results,
+                    "response_text": response_text,
                     "form_data": form_data
                 }
                 save_conversation_history_to_github(history)
