@@ -122,14 +122,17 @@ if submitted_query:
 
         # Extract the state and keyword from the user query
         state = ""
+        keyword = submitted_query.strip()
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip()
-            state_match = re.search(r'\b(\w{2})\b', parts[1])
-            if state_match:
-                state = state_match.group(1).upper()
-            else:
-                state = ""
+            keyword = parts[0].strip() if len(parts) > 0 else submitted_query.strip()
+            if len(parts) > 1:
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
+
+        st.write(f"Extracted keyword: {keyword}")
+        st.write(f"Extracted state: {state}")
 
         results = fetch_college_data(state, keyword)
         relevant_schools = [college['school.name'] for college in results] if results else []
