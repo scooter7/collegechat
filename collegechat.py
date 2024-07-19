@@ -113,6 +113,9 @@ if submitted_query:
         relevant_schools = extract_bolded_names(response_text)
         st.write(f"Extracted bolded school names: {relevant_schools}")
 
+        # Check if relevant_schools is populated
+        st.write(f"Relevant schools: {relevant_schools}")
+
         # Display form regardless of results
         with st.form(key="user_details_form"):
             st.write("Please fill out the form below to learn more about the colleges.")
@@ -127,11 +130,12 @@ if submitted_query:
                 relevant_schools
             )
             st.write(f"Options in multiselect: {relevant_schools}")
+            st.write(f"Selected schools before submit: {interested_schools}")
             submit_button = st.form_submit_button("Submit")
 
             if submit_button:
                 st.write("Form submitted")
-                st.write(f"Selected schools: {interested_schools}")
+                st.write(f"Selected schools after submit: {interested_schools}")
                 form_data = {
                     "first_name": first_name,
                     "last_name": last_name,
