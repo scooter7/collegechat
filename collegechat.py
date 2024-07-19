@@ -49,13 +49,13 @@ def fetch_college_data(state, keyword):
     }
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
+    st.write(f"Response content: {response.text}")  # Debug the response content
     if response.status_code == 200:
         results = response.json().get('results', [])
         st.write(f"College Scorecard API results: {results}")
         return results
     else:
         st.write("Failed to fetch data from College Scorecard API")
-        st.write(f"Response: {response.text}")
     return []
 
 def save_conversation_history_to_github(history):
@@ -136,7 +136,7 @@ if submitted_query:
 
         results = fetch_college_data(state, keyword)
         relevant_schools = [college['school.name'] for college in results] if results else []
-        
+
         # Debugging to check the relevant_schools
         st.write(f"Relevant schools extracted: {relevant_schools}")
 
