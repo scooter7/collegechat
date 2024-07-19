@@ -38,12 +38,10 @@ def interpret_query(query):
     return response
 
 def extract_bolded_names(text):
-    # Simplified approach to find all bolded names
-    st.write(f"Extracting bolded names from response text: {text}")
+    st.write(f"Extracting bolded names from response text:\n{text}")
     bolded_names = re.findall(r'\*\*(.*?)\*\*', text)
     st.write(f"Bolded names extracted: {bolded_names}")
     
-    # Filter out non-college/university names
     college_keywords = ['University', 'College', 'Institute', 'School of Nursing']
     filtered_names = [name for name in bolded_names if any(keyword in name for keyword in college_keywords)]
     st.write(f"Filtered bolded names: {filtered_names}")
@@ -56,7 +54,7 @@ def save_conversation_history_to_github(history):
     repo_name = "scooter7/collegechat"  # Replace with your repository name
     folder_path = "data"  # Folder in the repository
 
-    st.write(f"File content: {file_content}")
+    st.write(f"File content:\n{file_content}")
     st.write(f"File name: {file_name}")
     st.write(f"Repository name: {repo_name}")
     st.write(f"Folder path: {folder_path}")
@@ -103,7 +101,7 @@ if submitted_query:
         try:
             gemini_response = interpret_query(submitted_query)
             response_text = gemini_response.text
-            st.write(f"Response from Gemini: {response_text}")  # Debug the raw response text
+            st.write(f"Response from Gemini:\n{response_text}")  # Debug the raw response text
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
             response_text = ""
