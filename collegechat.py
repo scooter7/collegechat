@@ -7,7 +7,19 @@ from github import Github
 import re
 
 # Initialize Google Gemini with API Key
-genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
+genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
+college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
+github_token = st.secrets.get("github", {}).get("token", None)
+
+if not genai_api_key:
+    st.error("Google Gemini API key is missing.")
+if not college_scorecard_api_key:
+    st.error("College Scorecard API key is missing.")
+if not github_token:
+    st.error("GitHub token is missing.")
+
+# Initialize Google Gemini with API Key
+genai.configure(api_key=genai_api_key)
 
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
@@ -30,7 +42,7 @@ def fetch_college_data(state, keyword):
     st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
-        'api_key': st.secrets["college_scorecard"]["api_key"],
+        'api_key': college_scorecard_api_key,
         'school.state': state,
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
@@ -43,6 +55,7 @@ def fetch_college_data(state, keyword):
         return results
     else:
         st.write("Failed to fetch data from College Scorecard API")
+        st.write(f"Response: {response.text}")
     return []
 
 def save_conversation_history_to_github(query, results, form_data):
@@ -59,12 +72,26 @@ def save_conversation_history_to_github(query, results, form_data):
     repo_name = "scooter7/collegechat"  # Replace with your repository name
     folder_path = "data"  # Folder in the repository
 
+    st.write(f"File content: {file_content}")
+    st.write(f"File name: {file_name}")
+    st.write(f"Repository name: {repo_name}")
+    st.write(f"Folder path: {folder_path}")
+
     # Initialize Github instance
     try:
-        g = Github(st.secrets["github"]["token"])
+        g = Github(github_token)
+        st.write("GitHub instance created.")
         repo = g.get_repo(repo_name)
         st.write(f"Authenticated to GitHub repository: {repo_name}")
 
+        # Check if the folder exists
+        try:
+            contents = repo.get_contents(folder_path)
+            st.write(f"Folder {folder_path} exists in the repository.")
+        except:
+            st.write(f"Folder {folder_path} does not exist in the repository. Creating the folder.")
+            repo.create_file(f"{folder_path}/.gitkeep", "Create folder", "")
+        
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
         st.write(f"File {file_name} saved to GitHub repository {repo_name}")
