@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import google.generativeai as genai
+from datetime import datetime
+import json
+import os
+from github import Github
 
 # Initialize Google Gemini with API Key
 genai.configure(api_key=st.secrets["google_gen_ai"]["api_key"])
@@ -32,6 +36,26 @@ def fetch_college_data(keyword):
         return response.json().get('results', [])
     return None
 
+def save_conversation_history_to_github(query, results, form_data):
+    history = {
+        "timestamp": datetime.now().isoformat(),
+        "query": query,
+        "results": results,
+        "form_data": form_data
+    }
+    
+    file_content = json.dumps(history, indent=4)
+    file_name = f"conversation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    repo_name = "scooter7/collegechat"  # Replace with your repository name
+    folder_path = "data"  # Folder in the repository
+
+    # Initialize Github instance
+    g = Github(st.secrets["github"]["token"])
+    repo = g.get_repo(repo_name)
+    # Create the file in the repo
+    repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
+
+# Streamlit app UI
 st.title('College Information Assistant')
 query = st.text_input("Ask about colleges:")
 
@@ -46,9 +70,38 @@ if st.button("Ask"):
             keyword = gemini_response.text.strip()  # Simplified assumption
             results = fetch_college_data(keyword)
             if results:
+                st.write("Results found for:", keyword)
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+                    
+                # Create form
+                with st.form("user_details_form"):
+                    st.write("Please fill out the form below to learn more about the colleges.")
+                    first_name = st.text_input("First Name")
+                    last_name = st.text_input("Last Name")
+                    email = st.text_input("Email Address")
+                    dob = st.date_input("Date of Birth")
+                    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+                    zip_code = st.text_input("5-digit Zip Code")
+                    interested_schools = st.multiselect(
+                        "Schools you are interested in learning more about:",
+                        [college['school.name'] for college in results]
+                    )
+                    submit_button = st.form_submit_button("Submit")
+
+                    if submit_button:
+                        form_data = {
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "email": email,
+                            "dob": dob.strftime("%Y-%m-%d"),
+                            "graduation_year": graduation_year,
+                            "zip_code": zip_code,
+                            "interested_schools": interested_schools
+                        }
+                        save_conversation_history_to_github(query, results, form_data)
+                        st.success("Your information has been submitted successfully.")
             else:
-                st.write("Results found for:", keyword)
+                st.write("No results found for:", keyword)
     else:
         st.error("Please enter a query.")
