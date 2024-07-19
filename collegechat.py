@@ -1,52 +1,62 @@
 import streamlit as st
-import requests
-import google.generativeai as genai
 from datetime import datetime
 import json
-from github import Github
-import re
 
-# Initialize Google Gemini with API Key
-genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
-college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
-github_token = st.secrets.get("github", {}).get("token", None)
+# Dummy data for relevant schools
+relevant_schools = [
+    "University of Minnesota, Twin Cities",
+    "University of Minnesota, Duluth",
+    "Saint Mary's University of Minnesota",
+    "Carleton College",
+    "Hamline University",
+    "University of Wisconsin-Eau Claire",
+    "University of Wisconsin-River Falls",
+    "University of Wisconsin-Stout",
+    "University of Wisconsin-Superior",
+    "North Dakota State University"
+]
 
-if not genai_api_key:
-    st.error("Google Gemini API key is missing.")
-if not college_scorecard_api_key:
-    st.error("College Scorecard API key is missing.")
-if not github_token:
-    st.error("GitHub token is missing.")
+# Store the relevant schools in session state
+if 'relevant_schools' not in st.session_state:
+    st.session_state['relevant_schools'] = relevant_schools
 
-# Initialize Google Gemini with API Key
-genai.configure(api_key=genai_api_key)
+# Streamlit app UI
+st.title('College Information Assistant')
 
-# List of banned keywords
-banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
+with st.form(key="user_details_form"):
+    st.write("Please fill out the form below to learn more about the colleges.")
+    first_name = st.text_input("First Name")
+    last_name = st.text_input("Last Name")
+    email = st.text_input("Email Address")
+    dob = st.date_input("Date of Birth")
+    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+    zip_code = st.text_input("5-digit Zip Code")
+    interested_schools = st.multiselect(
+        "Schools you are interested in learning more about:",
+        st.session_state['relevant_schools']
+    )
+    st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")
+    st.write(f"Selected schools before submit: {interested_schools}")
+    submit_button = st.form_submit_button("Submit")
 
-def is_query_allowed(query):
-    st.write("Checking if the query contains banned keywords...")
-    result = not any(keyword in query.lower() for keyword in banned_keywords)
-    st.write(f"Query allowed: {result}")
-    return result
+    if submit_button:
+        st.write("Form submitted")
+        st.write(f"Selected schools after submit: {interested_schools}")
+        form_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "dob": dob.strftime("%Y-%m-%d"),
+            "graduation_year": graduation_year,
+            "zip_code": zip_code,
+            "interested_schools": interested_schools
+        }
+        st.write("Form data before saving: ", form_data)  # Debugging form data
 
-# Function to interpret the query using Google Gemini
-def interpret_query(query):
-    model = genai.GenerativeModel("gemini-pro")
-    chat = model.start_chat(history=[])
-    response = chat.send_message(query)
-    return response
+        # Display form data for debugging purposes
+        st.json(form_data)
 
-def extract_bolded_names(text):
-    st.write(f"Extracting bolded names from response text:\n{text}")
-    bolded_names = re.findall(r'\*\*(.*?)\*\*', text)
-    st.write(f"Bolded names extracted: {bolded_names}")
-    
-    college_keywords = ['University', 'College', 'Institute', 'School of Nursing']
-    filtered_names = [name for name in bolded_names if any(keyword in name for keyword in college_keywords)]
-    st.write(f"Filtered bolded names: {filtered_names}")
-    return filtered_names
-
+# Save conversation history to GitHub
 def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
     file_content = json.dumps(history, indent=4)
@@ -61,6 +71,8 @@ def save_conversation_history_to_github(history):
 
     # Initialize Github instance
     try:
+        from github import Github
+        github_token = st.secrets.get("github", {}).get("token", None)
         g = Github(github_token)
         st.write("GitHub instance created.")
         repo = g.get_repo(repo_name)
@@ -81,79 +93,13 @@ def save_conversation_history_to_github(history):
         st.write(f"Failed to save file to GitHub: {e}")
         st.write(f"Error details: {e}")
 
-# Streamlit app UI
-st.title('College Information Assistant')
-
-query = st.text_input("Ask about colleges:")
-submitted_query = st.session_state.get('submitted_query', '')
-
-if st.button("Ask"):
-    if query:
-        st.session_state['submitted_query'] = query
-        submitted_query = query
-
-if submitted_query:
-    st.write(f"User query: {submitted_query}")
-    if not is_query_allowed(submitted_query):
-        st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
-    else:
-        # Interpret the query with Gemini
-        try:
-            gemini_response = interpret_query(submitted_query)
-            response_text = gemini_response.text
-            st.write(f"Response from Gemini:\n{response_text}")  # Debug the raw response text
-        except Exception as e:
-            st.write(f"Error interacting with Gemini: {e}")
-            response_text = ""
-        
-        if not response_text:
-            response_text = "No response text available."
-
-        # Extract bolded names from the response text
-        relevant_schools = extract_bolded_names(response_text)
-        st.write(f"Extracted bolded school names: {relevant_schools}")
-
-        # Store the relevant schools in session state
-        st.session_state["relevant_schools"] = relevant_schools
-
-        # Display form regardless of results
-        with st.form(key="user_details_form"):
-            st.write("Please fill out the form below to learn more about the colleges.")
-            first_name = st.text_input("First Name")
-            last_name = st.text_input("Last Name")
-            email = st.text_input("Email Address")
-            dob = st.date_input("Date of Birth")
-            graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-            zip_code = st.text_input("5-digit Zip Code")
-            interested_schools = st.multiselect(
-                "Schools you are interested in learning more about:",
-                st.session_state['relevant_schools']
-            )
-            st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")
-            st.write(f"Selected schools before submit: {interested_schools}")
-            submit_button = st.form_submit_button("Submit")
-
-            if submit_button:
-                st.write("Form submitted")
-                st.write(f"Selected schools after submit: {interested_schools}")
-                form_data = {
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "email": email,
-                    "dob": dob.strftime("%Y-%m-%d"),
-                    "graduation_year": graduation_year,
-                    "zip_code": zip_code,
-                    "interested_schools": interested_schools
-                }
-                st.write("Form data before saving: ", form_data)  # Debugging form data
-
-                # Save conversation history to GitHub
-                history = {
-                    "timestamp": datetime.now().isoformat(),
-                    "query": submitted_query,
-                    "response_text": response_text,
-                    "form_data": form_data
-                }
-                st.write(f"History to be saved: {history}")  # Debugging history data
-                save_conversation_history_to_github(history)
-                st.success("Your information has been submitted successfully.")
+# Add a button to save the conversation history to GitHub for testing purposes
+if st.button("Save to GitHub"):
+    history = {
+        "timestamp": datetime.now().isoformat(),
+        "query": "graduate physics programs in Minnesota",
+        "response_text": "University of Minnesota, Twin Cities\n\n* Department of Physics and Astronomy\n* PhD in Physics\n* MS in Physics\n* MA in Physics Education\n\nUniversity of Minnesota, Duluth\n\n* Department of Physics and Astronomy\n* MS in Physics\n* MA in Physics Education\n\nSaint Mary's University of Minnesota\n\n* Department of Physics, Mathematics, and Computer Science\n* MS in Physics\n\nCarleton College\n\n* Department of Physics and Astronomy\n* MA in Physics (for educators)\n\nHamline University\n\n* Department of Physics and Astronomy\n* AAPT Master of Arts in Physics (for educators)\n\nOther Programs in the Region\n\n* University of Wisconsin-Eau Claire: MA in Physics Education\n* University of Wisconsin-River Falls: MA in Physics Education\n* University of Wisconsin-Stout: MS in Physics (for educators)\n* University of Wisconsin-Superior: MS in Physics (for educators)\n* North Dakota State University: MS in Physics",
+        "form_data": form_data
+    }
+    st.write(f"History to be saved: {history}")
+    save_conversation_history_to_github(history)
