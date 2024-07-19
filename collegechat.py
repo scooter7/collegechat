@@ -38,8 +38,10 @@ def interpret_query(query):
     return response
 
 def extract_bolded_names(text):
-    # Refine regex to match college and university names only
+    # Use regex to find all occurrences of bolded names
+    st.write(f"Extracting bolded names from response text: {text}")
     bolded_names = re.findall(r'\*\*([\w\s]+(?:University|College|Institute|School of Nursing))\*\*', text)
+    st.write(f"Bolded names extracted: {bolded_names}")
     return bolded_names
 
 def save_conversation_history_to_github(history):
@@ -97,12 +99,10 @@ if submitted_query:
             gemini_response = interpret_query(submitted_query)
             response_text = gemini_response.text
             st.write(f"Response from Gemini: {response_text}")
-            keyword = "engineering"  # Use the keyword to fetch data; fallback in case no extraction
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
             response_text = ""
-            keyword = "engineering"  # Fallback keyword
-
+        
         if not response_text:
             response_text = "No response text available."
 
