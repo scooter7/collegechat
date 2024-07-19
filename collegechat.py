@@ -49,14 +49,23 @@ def fetch_college_data(state, keyword):
     }
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
-    st.write(f"Response content: {response.json()}")  # Debug the response content
-    if response.status_code == 200:
-        results = response.json().get('results', [])
+    
+    # Check if the response contains JSON data
+    try:
+        response_data = response.json()
+        st.write(f"Response JSON data: {response_data}")
+    except ValueError:
+        st.write("Failed to parse JSON from College Scorecard API response")
+        return []
+    
+    # Check if the 'results' key exists and contains data
+    if 'results' in response_data:
+        results = response_data['results']
         st.write(f"College Scorecard API results: {results}")
         return results
     else:
-        st.write("Failed to fetch data from College Scorecard API")
-    return []
+        st.write("No 'results' key in the College Scorecard API response")
+        return []
 
 def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
