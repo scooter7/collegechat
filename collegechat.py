@@ -59,11 +59,14 @@ def save_conversation_history_to_github(query, results, form_data):
     folder_path = "data"  # Folder in the repository
 
     # Initialize Github instance
-    g = Github(st.secrets["github"]["token"])
-    repo = g.get_repo(repo_name)
-    # Create the file in the repo
-    repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
-    st.write(f"File {file_name} saved to GitHub repository {repo_name}")
+    try:
+        g = Github(st.secrets["github"]["token"])
+        repo = g.get_repo(repo_name)
+        # Create the file in the repo
+        repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
+        st.write(f"File {file_name} saved to GitHub repository {repo_name}")
+    except Exception as e:
+        st.write(f"Failed to save file to GitHub: {e}")
 
 # Streamlit app UI
 st.title('College Information Assistant')
@@ -125,6 +128,7 @@ if st.button("Ask"):
                             "zip_code": zip_code,
                             "interested_schools": interested_schools
                         }
+                        st.write("Form data: ", form_data)  # Debugging form data
                         save_conversation_history_to_github(query, results, form_data)
                         st.success("Your information has been submitted successfully.")
             else:
