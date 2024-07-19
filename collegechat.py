@@ -1,27 +1,25 @@
 import streamlit as st
-import json
+import requests
+import google.generativeai as genai
 from datetime import datetime
+import json
 from github import Github
-
-# Simplified for debugging
-# import requests
-# import google.generativeai as genai
 import re
 
-# # Initialize Google Gemini with API Key
-# genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
-# college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
+# Initialize Google Gemini with API Key
+genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
+college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
 github_token = st.secrets.get("github", {}).get("token", None)
 
-# if not genai_api_key:
-#     st.error("Google Gemini API key is missing.")
-# if not college_scorecard_api_key:
-#     st.error("College Scorecard API key is missing.")
+if not genai_api_key:
+    st.error("Google Gemini API key is missing.")
+if not college_scorecard_api_key:
+    st.error("College Scorecard API key is missing.")
 if not github_token:
     st.error("GitHub token is missing.")
 
 # Initialize Google Gemini with API Key
-# genai.configure(api_key=genai_api_key)
+genai.configure(api_key=genai_api_key)
 
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
@@ -32,33 +30,33 @@ def is_query_allowed(query):
     st.write(f"Query allowed: {result}")
     return result
 
-# # Function to interpret the query using Google Gemini
-# def interpret_query(query):
-#     model = genai.GenerativeModel("gemini-pro")
-#     chat = model.start_chat(history=[])
-#     response = chat.send_message(query)
-#     return response
+# Function to interpret the query using Google Gemini
+def interpret_query(query):
+    model = genai.GenerativeModel("gemini-pro")
+    chat = model.start_chat(history=[])
+    response = chat.send_message(query)
+    return response
 
-# # Function to fetch data from the College Scorecard API
-# def fetch_college_data(state, keyword):
-#     st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
-#     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
-#     params = {
-#         'api_key': college_scorecard_api_key,
-#         'school.state': state,
-#         'school.name': keyword,
-#         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
-#     }
-#     response = requests.get(url, params=params)
-#     st.write(f"College Scorecard API response status code: {response.status_code}")
-#     st.write(f"Response content: {response.text}")  # Debug the response content
-#     if response.status_code == 200:
-#         results = response.json().get('results', [])
-#         st.write(f"College Scorecard API results: {results}")
-#         return results
-#     else:
-#         st.write("Failed to fetch data from College Scorecard API")
-#     return []
+# Function to fetch data from the College Scorecard API
+def fetch_college_data(state, keyword):
+    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
+    url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
+    params = {
+        'api_key': college_scorecard_api_key,
+        'school.state': state,
+        'school.name': keyword,
+        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
+    }
+    response = requests.get(url, params=params)
+    st.write(f"College Scorecard API response status code: {response.status_code}")
+    st.write(f"Response content: {response.text}")  # Debug the response content
+    if response.status_code == 200:
+        results = response.json().get('results', [])
+        st.write(f"College Scorecard API results: {results}")
+        return results
+    else:
+        st.write("Failed to fetch data from College Scorecard API")
+    return []
 
 def save_conversation_history_to_github(history):
     st.write("Saving conversation history to GitHub...")
@@ -110,18 +108,33 @@ if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
-        # Simulated response for debugging
-        keyword = "engineering"
-        state = "CA"
-        st.write(f"Simulated keyword: {keyword}")
-        st.write(f"Simulated state: {state}")
+        # Interpret the query with Gemini
+        try:
+            gemini_response = interpret_query(submitted_query)
+            keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using keyword from Gemini: {keyword}")
+        except Exception as e:
+            st.write(f"Error interacting with Gemini: {e}")
+            keyword = "engineering"  # Fallback keyword
 
-        # Simulate fetched college data
-        results = [
-            {"school.name": "Stanford University", "school.city": "Stanford", "school.state": "CA"},
-            {"school.name": "California Institute of Technology", "school.city": "Pasadena", "school.state": "CA"},
-            {"school.name": "University of California, Berkeley", "school.city": "Berkeley", "school.state": "CA"}
-        ]
+        if not keyword:
+            keyword = "engineering"  # Fallback keyword
+
+        # Extract the state and keyword from the user query
+        state = ""
+        keyword = submitted_query.strip()
+        if "in" in submitted_query:
+            parts = re.split(r'\bin\b', submitted_query)
+            keyword = parts[0].strip() if len(parts) > 0 else submitted_query.strip()
+            if len(parts) > 1:
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
+
+        st.write(f"Extracted keyword: {keyword}")
+        st.write(f"Extracted state: {state}")
+
+        results = fetch_college_data(state, keyword)
         relevant_schools = [college['school.name'] for college in results]
 
         # Debugging to check the relevant_schools
