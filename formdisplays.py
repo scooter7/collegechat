@@ -3,7 +3,6 @@ import requests
 import google.generativeai as genai
 from datetime import datetime
 import json
-import os
 from github import Github
 
 # Initialize Google Gemini with API Key
@@ -101,9 +100,8 @@ if st.button("Ask"):
                 for college in results:
                     st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
 
-                # Create form after displaying the results
-                st.write("Displaying form...")
-                with st.form("user_details_form"):
+                # Display form directly for debugging
+                with st.form(key="user_details_form"):
                     st.write("Please fill out the form below to learn more about the colleges.")
                     first_name = st.text_input("First Name")
                     last_name = st.text_input("Last Name")
