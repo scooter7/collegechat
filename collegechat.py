@@ -32,18 +32,23 @@ def fetch_college_data(query):
     return []
 
 def save_conversation_history_to_github(query, results, form_data):
-    st.write("Saving conversation history to GitHub...")
+    st.write("Preparing to save conversation history to GitHub...")
     history = {
         "timestamp": datetime.now().isoformat(),
         "query": query,
         "results": results,
         "form_data": form_data
     }
-    
+
     file_content = json.dumps(history, indent=4)
     file_name = f"conversation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     repo_name = "scooter7/collegechat"  # Replace with your repository name
     folder_path = "data"  # Folder in the repository
+
+    st.write(f"File name: {file_name}")
+    st.write(f"Repository name: {repo_name}")
+    st.write(f"Folder path: {folder_path}")
+    st.write(f"File content: {file_content}")
 
     # Initialize Github instance
     g = Github(st.secrets["github"]["token"])
