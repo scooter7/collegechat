@@ -146,6 +146,7 @@ if submitted_query:
 
 # Display form regardless of results
 if 'relevant_schools' in st.session_state:
+    st.write(f"Session state relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
     with st.form(key="user_details_form"):
         st.write("Please fill out the form below to learn more about the colleges.")
         first_name = st.text_input("First Name")
@@ -158,6 +159,8 @@ if 'relevant_schools' in st.session_state:
             "Schools you are interested in learning more about:",
             st.session_state['relevant_schools']
         )
+        st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")  # Debug statement
+        st.write(f"Selected schools before submit: {interested_schools}")  # Debug statement
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
