@@ -104,6 +104,7 @@ if st.button("Ask"):
         st.session_state['submitted_query'] = query
         submitted_query = query
         st.session_state['relevant_schools'] = []  # Reset the relevant schools list
+        st.write("New query submitted, relevant_schools reset.")
 
 if submitted_query:
     st.write(f"User query: {submitted_query}")
@@ -133,6 +134,7 @@ if submitted_query:
             else:
                 state = ""
 
+        st.write(f"State: {state}, Keyword: {keyword}")  # Debug statement
         results = fetch_college_data(state, keyword)
         if results:
             relevant_schools = [college['school.name'] for college in results]
@@ -144,6 +146,7 @@ if submitted_query:
 
 # Display form regardless of results
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+    st.write(f"Session state relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
     with st.form(key="user_details_form"):
         st.write("Please fill out the form below to learn more about the colleges.")
         first_name = st.text_input("First Name")
@@ -156,6 +159,8 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
             "Schools you are interested in learning more about:",
             st.session_state['relevant_schools']
         )
+        st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")  # Debug statement
+        st.write(f"Selected schools before submit: {interested_schools}")  # Debug statement
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
