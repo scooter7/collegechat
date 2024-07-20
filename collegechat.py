@@ -112,8 +112,8 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
+            st.write(f"Gemini response: {gemini_response.text}")
             keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
             keyword = "engineering"  # Fallback keyword
@@ -132,8 +132,10 @@ if submitted_query:
                     state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else []
 
+        # Extract school names from the response text (assuming it's in a structured format)
+        relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
+        
         st.session_state['relevant_schools'] = relevant_schools
 
         if results:
