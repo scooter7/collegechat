@@ -157,13 +157,16 @@ selected_schools = st.session_state['selected_schools']
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
     for i, school in enumerate(st.session_state['relevant_schools']):
-        checked = st.checkbox(school, key=f"{school}_{i}", value=school in selected_schools)
+        if f"{school}_{i}" not in st.session_state:
+            st.session_state[f"{school}_{i}"] = False
+        checked = st.checkbox(school, key=f"{school}_{i}", value=st.session_state[f"{school}_{i}"])
         if checked:
             if school not in selected_schools:
                 selected_schools.append(school)
         else:
             if school in selected_schools:
                 selected_schools.remove(school)
+        st.session_state[f"{school}_{i}"] = checked
 
 # Always show form for user details
 with st.form(key="user_details_form"):
