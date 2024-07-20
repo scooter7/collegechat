@@ -1,0 +1,17 @@
+{
+    "timestamp": "2024-07-20T00:30:01.005715",
+    "query": "graduate business programs in New York",
+    "results": [
+        "**Top Graduate Business Programs in New York**\n\n**1. Columbia Business School**\n* MBA Program\n* Executive MBA Program\n* Doctoral Program\n\n**2. New York University Stern School of Business**\n* MBA Program\n* Executive MBA Program\n* MS in Business Analytics Program\n\n**3. Cornell University Johnson Graduate School of Management**\n* MBA Program\n* Executive MBA Program\n* MBA/Cornell Tech Program\n\n**4. Fordham University Gabelli School of Business**\n* MBA Program\n* Executive MBA Program\n* MS in Finance Program\n\n**5. New York Institute of Technology",
+        "* MBA Program\n* Executive MBA Program\n* MS in Management Program\n\n**6. Baruch College Zicklin School of Business**\n* MBA Program\n* Executive MBA Program\n* Doctoral Program\n\n**7. Pace University Lubin School of Business**\n* MBA Program\n* Executive MBA Program\n* MS in Finance Program\n\n**8. Manhattan College Dolan School of Business**\n* MBA Program\n* Executive MBA Program\n* MS in Taxation Program\n\n**9. St. John's University School of Business**\n* MBA Program\n* Executive MBA Program\n* MS in Finance Program\n\n**10. SUNY Buffalo School of Management**\n* MBA Program\n* Executive MBA Program\n* PhD in Management Program\n\n**11. Rochester Institute of Technology"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@test.net",
+        "dob": "2024-07-20",
+        "graduation_year": 1900,
+        "zip_code": "10101",
+        "interested_schools": []
+    }
+}
