@@ -152,26 +152,18 @@ if submitted_query:
 if 'selected_schools' not in st.session_state:
     st.session_state['selected_schools'] = []
 
-# Initialize checkbox states before rendering them
-if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-    for i, school in enumerate(st.session_state['relevant_schools']):
-        if f"{school}_{i}" not in st.session_state:
-            st.session_state[f"{school}_{i}"] = False
-
 # Display checkboxes for each school
-selected_schools = st.session_state['selected_schools']
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
+    selected_schools = st.session_state['selected_schools']
     for i, school in enumerate(st.session_state['relevant_schools']):
-        checked = st.session_state[f"{school}_{i}"]
-        if st.checkbox(school, key=f"{school}_{i}", value=checked):
+        if st.checkbox(school, key=f"{school}_{i}"):
             if school not in selected_schools:
                 selected_schools.append(school)
-                st.session_state[f"{school}_{i}"] = True
         else:
             if school in selected_schools:
                 selected_schools.remove(school)
-                st.session_state[f"{school}_{i}"] = False
+    st.session_state['selected_schools'] = selected_schools
 
 # Always show form for user details
 with st.form(key="user_details_form"):
@@ -185,7 +177,7 @@ with st.form(key="user_details_form"):
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        if not selected_schools:
+        if not st.session_state['selected_schools']:
             st.error("Please select at least one school to continue.")
         else:
             st.write("Form submitted")
@@ -196,7 +188,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": selected_schools
+                "interested_schools": st.session_state['selected_schools']
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
