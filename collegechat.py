@@ -5,10 +5,6 @@ import google.generativeai as genai
 import json
 from github import Github
 import re
-import spacy
-
-# Load spaCy model
-nlp = spacy.load("en_core_web_sm")
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -62,10 +58,9 @@ def fetch_college_data(state, keyword):
         st.write(f"Response: {response.text}")
     return []
 
-# Function to extract college/university names using spaCy
-def extract_college_names(text):
-    doc = nlp(text)
-    colleges = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
+# Function to extract college/university names using regex
+def extract_college_names(results):
+    colleges = [college['school.name'] for college in results]
     return colleges
 
 # Function to save conversation history to GitHub
@@ -142,17 +137,13 @@ if submitted_query:
                     state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else []
+        extracted_colleges = extract_college_names(results)
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-            # Extract college names using spaCy
-            results_text = " ".join([college['school.name'] for college in results])
-            extracted_colleges = extract_college_names(results_text)
         else:
             st.write(f"No results found for: {keyword}")
-            extracted_colleges = []
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
