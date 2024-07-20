@@ -6,22 +6,6 @@ import json
 from github import Github
 import re
 
-# Dummy data for relevant schools
-default_relevant_schools = [
-    "University of Minnesota - Twin Cities",
-    "Augsburg University",
-    "Carleton College",
-    "Hamline University",
-    "Macalester College",
-    "Saint Mary's University of Minnesota",
-    "Saint Olaf College",
-    "University of Saint Thomas"
-]
-
-# Store the default relevant schools in session state if not already set
-if 'relevant_schools' not in st.session_state:
-    st.session_state['relevant_schools'] = default_relevant_schools
-
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
@@ -125,11 +109,11 @@ if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
-        # Interpret the query with Gemini
+        gemini_response = None
         try:
             gemini_response = interpret_query(submitted_query)
+            st.write(f"Gemini response: {gemini_response.text}")
             keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
             keyword = "engineering"  # Fallback keyword
@@ -141,15 +125,22 @@ if submitted_query:
         state = ""
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip()
-            state_match = re.search(r'\b(\w{2})\b', parts[1])
-            if state_match:
-                state = state_match.group(1).upper()
-            else:
-                state = ""
+            if len(parts) > 1:
+                keyword = parts[0].strip()
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else default_relevant_schools
+
+        # Extract school names from the Gemini response if available
+        relevant_schools = []
+        if gemini_response:
+            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
+        
+        st.session_state['relevant_schools'] = relevant_schools
+        st.write(f"Relevant schools: {relevant_schools}")
+
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
@@ -168,7 +159,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                relevant_schools
+                st.session_state.get('relevant_schools', [])
             )
             submit_button = st.form_submit_button("Submit")
 
