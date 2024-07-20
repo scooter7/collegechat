@@ -153,17 +153,19 @@ if 'selected_schools' not in st.session_state:
     st.session_state['selected_schools'] = []
 
 # Display checkboxes for each school
+selected_schools = st.session_state['selected_schools']
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
     for i, school in enumerate(st.session_state['relevant_schools']):
-        if st.checkbox(school, key=f"{school}_{i}"):
-            if school not in st.session_state['selected_schools']:
-                st.session_state['selected_schools'].append(school)
+        checked = st.checkbox(school, key=f"{school}_{i}", value=school in selected_schools)
+        if checked:
+            if school not in selected_schools:
+                selected_schools.append(school)
         else:
-            if school in st.session_state['selected_schools']:
-                st.session_state['selected_schools'].remove(school)
+            if school in selected_schools:
+                selected_schools.remove(school)
 
-# Form for user details (always displayed)
+# Always show form for user details
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
     first_name = st.text_input("First Name")
@@ -175,24 +177,27 @@ with st.form(key="user_details_form"):
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        st.write("Form submitted")
-        form_data = {
-            "first_name": first_name,
-            "last_name": last_name,
-            "email": email,
-            "dob": dob.strftime("%Y-%m-%d"),
-            "graduation_year": graduation_year,
-            "zip_code": zip_code,
-            "interested_schools": st.session_state['selected_schools']
-        }
-        st.write("Form data: ", form_data)  # Debugging form data
+        if not selected_schools:
+            st.error("Please select at least one school to continue.")
+        else:
+            st.write("Form submitted")
+            form_data = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "dob": dob.strftime("%Y-%m-%d"),
+                "graduation_year": graduation_year,
+                "zip_code": zip_code,
+                "interested_schools": selected_schools
+            }
+            st.write("Form data: ", form_data)  # Debugging form data
 
-        # Save conversation history to GitHub
-        history = {
-            "timestamp": datetime.now().isoformat(),
-            "query": submitted_query,
-            "results": results,
-            "form_data": form_data
-        }
-        save_conversation_history_to_github(history)
-        st.success("Your information has been submitted successfully.")
+            # Save conversation history to GitHub
+            history = {
+                "timestamp": datetime.now().isoformat(),
+                "query": submitted_query,
+                "results": results,
+                "form_data": form_data
+            }
+            save_conversation_history_to_github(history)
+            st.success("Your information has been submitted successfully.")
