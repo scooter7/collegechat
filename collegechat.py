@@ -117,22 +117,22 @@ if submitted_query:
             
             # Extract bolded school names
             bolded_schools = re.findall(r'\*\*(.*?)\*\*', gemini_text)
-            st.session_state['relevant_schools'] = bolded_schools if bolded_schools else default_relevant_schools
+            st.session_state['relevant_schools'] = bolded_schools if bolded_schools else []
             st.write(f"Relevant schools extracted: {st.session_state['relevant_schools']}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            st.session_state['relevant_schools'] = default_relevant_schools
+            st.session_state['relevant_schools'] = []
 
         # Extract the state and keyword from the user query
         state = ""
+        keyword = submitted_query.strip()
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip()
-            state_match = re.search(r'\b(\w{2})\b', parts[1])
-            if state_match:
-                state = state_match.group(1).upper()
-            else:
-                state = ""
+            if len(parts) > 1:
+                keyword = parts[0].strip()
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
         if results:
@@ -153,7 +153,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                st.session_state['relevant_schools']
+                st.session_state.get('relevant_schools', [])
             )
             submit_button = st.form_submit_button("Submit")
 
