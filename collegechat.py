@@ -6,22 +6,6 @@ import json
 from github import Github
 import re
 
-# Dummy data for relevant schools
-default_relevant_schools = [
-    "University of Minnesota - Twin Cities",
-    "Augsburg University",
-    "Carleton College",
-    "Hamline University",
-    "Macalester College",
-    "Saint Mary's University of Minnesota",
-    "Saint Olaf College",
-    "University of Saint Thomas"
-]
-
-# Store the default relevant schools in session state if not already set
-if 'relevant_schools' not in st.session_state:
-    st.session_state['relevant_schools'] = default_relevant_schools
-
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
@@ -148,7 +132,7 @@ if submitted_query:
                     state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else default_relevant_schools
+        relevant_schools = [college['school.name'] for college in results] if results else []
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
