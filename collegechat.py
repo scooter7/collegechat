@@ -129,12 +129,13 @@ if submitted_query:
         state = ""
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip()
-            state_match = re.search(r'\b(\w{2})\b', parts[1])
-            if state_match:
-                state = state_match.group(1).upper()
-            else:
-                state = ""
+            if len(parts) > 1:
+                keyword = parts[0].strip()
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
+                else:
+                    state = ""
 
         results = fetch_college_data(state, keyword)
         st.session_state['relevant_schools'] = [college['school.name'] for college in results] if results else []
