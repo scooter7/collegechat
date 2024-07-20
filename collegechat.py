@@ -24,14 +24,6 @@ genai.configure(api_key=genai_api_key)
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
-# Map of program keywords
-program_keywords = {
-    "nursing": "nursing",
-    "business": "business",
-    "engineering": "engineering",
-    "computer science": "computer science"
-}
-
 def is_query_allowed(query):
     st.write("Checking if the query contains banned keywords...")
     result = not any(keyword in query.lower() for keyword in banned_keywords)
@@ -55,8 +47,6 @@ def fetch_college_data(state, keyword):
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
-    st.write(f"Request URL: {url}")
-    st.write(f"Request Params: {params}")
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
     if response.status_code == 200:
@@ -67,11 +57,6 @@ def fetch_college_data(state, keyword):
         st.write("Failed to fetch data from College Scorecard API")
         st.write(f"Response: {response.text}")
     return []
-
-# Function to extract college/university names using regex
-def extract_college_names(results):
-    colleges = [college['school.name'] for college in results]
-    return colleges
 
 # Function to save conversation history to GitHub
 def save_conversation_history_to_github(history):
@@ -127,32 +112,29 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
-            keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
+            gemini_text = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Gemini response: {gemini_text}")
+            
+            # Extract bolded school names
+            bolded_schools = re.findall(r'\*\*(.*?)\*\*', gemini_text)
+            st.session_state['relevant_schools'] = bolded_schools if bolded_schools else default_relevant_schools
+            st.write(f"Relevant schools extracted: {st.session_state['relevant_schools']}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            keyword = "nursing"  # Fallback keyword
-
-        if not keyword:
-            keyword = "nursing"  # Fallback keyword
+            st.session_state['relevant_schools'] = default_relevant_schools
 
         # Extract the state and keyword from the user query
         state = ""
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
             keyword = parts[0].strip()
-            if len(parts) > 1:
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-        
-        st.write(f"Extracted state: {state}")
-        st.write(f"Extracted keyword: {keyword}")
+            state_match = re.search(r'\b(\w{2})\b', parts[1])
+            if state_match:
+                state = state_match.group(1).upper()
+            else:
+                state = ""
 
         results = fetch_college_data(state, keyword)
-        extracted_colleges = extract_college_names(results)
-        st.write(f"Extracted colleges: {extracted_colleges}")
-
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
@@ -171,7 +153,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                extracted_colleges
+                st.session_state['relevant_schools']
             )
             submit_button = st.form_submit_button("Submit")
 
