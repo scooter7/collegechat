@@ -153,7 +153,7 @@ selected_schools = []
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
     for school in st.session_state['relevant_schools']:
-        if st.checkbox(school):
+        if st.checkbox(school, key=school):
             selected_schools.append(school)
 
 # Form for user details
