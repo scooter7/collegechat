@@ -103,6 +103,7 @@ if st.button("Ask"):
     if query:
         st.session_state['submitted_query'] = query
         submitted_query = query
+        st.session_state['relevant_schools'] = []  # Reset the relevant schools list
 
 if submitted_query:
     st.write(f"User query: {submitted_query}")
@@ -133,21 +134,18 @@ if submitted_query:
                 state = ""
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else ["No schools found"]
-        st.write(f"Relevant schools: {relevant_schools}")  # Debug statement
-
         if results:
-            st.write(f"Results found for: {keyword} in {state}")
-            for college in results:
-                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            relevant_schools = [college['school.name'] for college in results]
         else:
-            st.write(f"No results found for: {keyword}")
+            relevant_schools = ["No schools found"]
+
+        st.write(f"Relevant schools: {relevant_schools}")  # Debug statement
 
         # Store relevant schools in session state for the form
         st.session_state['relevant_schools'] = relevant_schools
 
 # Display form regardless of results
-if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+if 'relevant_schools' in st.session_state:
     with st.form(key="user_details_form"):
         st.write("Please fill out the form below to learn more about the colleges.")
         first_name = st.text_input("First Name")
@@ -179,7 +177,7 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
             history = {
                 "timestamp": datetime.now().isoformat(),
                 "query": submitted_query,
-                "results": results,
+                "results": st.session_state['relevant_schools'],
                 "form_data": form_data
             }
             save_conversation_history_to_github(history)
