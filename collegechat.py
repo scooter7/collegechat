@@ -126,7 +126,7 @@ if submitted_query:
             interpreted_response = ""
 
         # Extract schools from the interpreted response
-        school_pattern = re.compile(r'\d+\.\s+([^()]+)\s+\([^()]+\)')
+        school_pattern = re.compile(r'^[^()]+(?=\s+\()', re.MULTILINE)
         gemini_schools = school_pattern.findall(interpreted_response)
         st.write(f"Extracted schools from Gemini response: {gemini_schools}")
 
