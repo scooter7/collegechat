@@ -1,18 +1,25 @@
 import streamlit as st
 from datetime import datetime
 import requests
+import google.generativeai as genai
 import json
 from github import Github
 import re
 
 # Initialize API Keys
+genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
 github_token = st.secrets.get("github", {}).get("token", None)
 
+if not genai_api_key:
+    st.error("Google Gemini API key is missing.")
 if not college_scorecard_api_key:
     st.error("College Scorecard API key is missing.")
 if not github_token:
     st.error("GitHub token is missing.")
+
+# Initialize Google Gemini with API Key
+genai.configure(api_key=genai_api_key)
 
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
@@ -31,17 +38,23 @@ def is_query_allowed(query):
     st.write(f"Query allowed: {result}")
     return result
 
+# Function to interpret the query using Google Gemini
+def interpret_query(query):
+    model = genai.GenerativeModel("gemini-pro")
+    chat = model.start_chat(history=[])
+    response = chat.send_message(query)
+    return response
+
 # Function to fetch data from the College Scorecard API
-def fetch_college_data(state, program):
-    st.write(f"Fetching college data for state: {state}, program: {program}...")
+def fetch_college_data(state, keyword):
+    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
         'api_key': college_scorecard_api_key,
         'school.state': state,
+        'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
-    if program:
-        params['latest.programs.cip_4_digit.title'] = program
     st.write(f"Request URL: {url}")
     st.write(f"Request Params: {params}")
     response = requests.get(url, params=params)
@@ -55,7 +68,7 @@ def fetch_college_data(state, program):
         st.write(f"Response: {response.text}")
     return []
 
-# Function to extract college/university names
+# Function to extract college/university names using regex
 def extract_college_names(results):
     colleges = [college['school.name'] for college in results]
     return colleges
@@ -111,9 +124,20 @@ if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
+        # Interpret the query with Gemini
+        try:
+            gemini_response = interpret_query(submitted_query)
+            keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using keyword from Gemini: {keyword}")
+        except Exception as e:
+            st.write(f"Error interacting with Gemini: {e}")
+            keyword = "nursing"  # Fallback keyword
+
+        if not keyword:
+            keyword = "nursing"  # Fallback keyword
+
         # Extract the state and keyword from the user query
         state = ""
-        program = None
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
             keyword = parts[0].strip()
@@ -122,28 +146,19 @@ if submitted_query:
                 if state_match:
                     state = state_match.group(1).upper()
         
-        # Map keyword to program
-        for key in program_keywords:
-            if key in submitted_query.lower():
-                program = program_keywords[key]
-                break
-        
-        if not program:
-            program = "nursing"  # Fallback program
-
         st.write(f"Extracted state: {state}")
-        st.write(f"Extracted program: {program}")
+        st.write(f"Extracted keyword: {keyword}")
 
-        results = fetch_college_data(state, program)
+        results = fetch_college_data(state, keyword)
         extracted_colleges = extract_college_names(results)
         st.write(f"Extracted colleges: {extracted_colleges}")
 
         if results:
-            st.write(f"Results found for: {program} in {state}")
+            st.write(f"Results found for: {keyword} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
-            st.write(f"No results found for: {program}")
+            st.write(f"No results found for: {keyword}")
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
