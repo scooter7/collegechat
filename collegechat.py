@@ -51,15 +51,17 @@ def fetch_college_data(state, keyword):
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
-    response = requests.get(url, params=params)
-    st.write(f"College Scorecard API response status code: {response.status_code}")
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, params=params)
+        st.write(f"College Scorecard API response status code: {response.status_code}")
+        response.raise_for_status()  # This will raise an HTTPError for bad responses
         results = response.json().get('results', [])
         st.write(f"College Scorecard API results: {results}")
         return results
-    else:
-        st.write("Failed to fetch data from College Scorecard API")
-        st.write(f"Response: {response.text}")
+    except requests.exceptions.HTTPError as http_err:
+        st.error(f"HTTP error occurred: {http_err}")
+    except Exception as err:
+        st.error(f"An error occurred: {err}")
     return []
 
 # Function to save conversation history to GitHub
@@ -136,6 +138,9 @@ if submitted_query:
                     state = state_match.group(1).upper()
                 else:
                     state = ""
+
+        if not state:
+            st.warning("State is not specified in the query. Defaulting to a general search.")
 
         results = fetch_college_data(state, keyword)
         st.session_state['relevant_schools'] = [college['school.name'] for college in results] if results else []
