@@ -1,0 +1,17 @@
+{
+    "timestamp": "2024-07-20T23:40:08.171520",
+    "query": "best nursing schools",
+    "results": [],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "v",
+        "email": "t@est.org",
+        "dob": "2024-07-20",
+        "graduation_year": 1900,
+        "zip_code": "11111",
+        "interested_schools": [
+            "Johns Hopkins University",
+            "Duke University"
+        ]
+    }
+}
