@@ -6,6 +6,22 @@ import json
 from github import Github
 import re
 
+# Dummy data for relevant schools
+default_relevant_schools = [
+    "University of Minnesota - Twin Cities",
+    "Augsburg University",
+    "Carleton College",
+    "Hamline University",
+    "Macalester College",
+    "Saint Mary's University of Minnesota",
+    "Saint Olaf College",
+    "University of Saint Thomas"
+]
+
+# Store the default relevant schools in session state if not already set
+if 'relevant_schools' not in st.session_state:
+    st.session_state['relevant_schools'] = default_relevant_schools
+
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 college_scorecard_api_key = st.secrets.get("college_scorecard", {}).get("api_key", None)
@@ -45,19 +61,14 @@ def fetch_college_data(state, keyword):
         'api_key': college_scorecard_api_key,
         'school.state': state,
         'school.name': keyword,
-        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall',
-        'per_page': 100  # Increase the number of results returned
+        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
     if response.status_code == 200:
-        results = response.json()
-        st.write(f"College Scorecard API raw response: {results}")
-        if 'results' in results and results['results']:
-            return results['results']
-        else:
-            st.write("No 'results' field in API response.")
-            return []
+        results = response.json().get('results', [])
+        st.write(f"College Scorecard API results: {results}")
+        return results
     else:
         st.write("Failed to fetch data from College Scorecard API")
         st.write(f"Response: {response.text}")
@@ -108,8 +119,6 @@ if st.button("Ask"):
     if query:
         st.session_state['submitted_query'] = query
         submitted_query = query
-        st.session_state['relevant_schools'] = []  # Reset the relevant schools list
-        st.write("New query submitted, relevant_schools reset.")
 
 if submitted_query:
     st.write(f"User query: {submitted_query}")
@@ -119,83 +128,69 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
-            interpreted_response = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using interpreted response from Gemini: {interpreted_response}")
+            keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            interpreted_response = ""
+            keyword = "engineering"  # Fallback keyword
 
-        # Extract schools from the interpreted response
-        school_pattern = re.compile(r'^[^()]+(?=\s+\()', re.MULTILINE)
-        gemini_schools = school_pattern.findall(interpreted_response)
-        st.write(f"Extracted schools from Gemini response: {gemini_schools}")
+        if not keyword:
+            keyword = "engineering"  # Fallback keyword
 
-        # If no schools found in Gemini response, fallback to keyword search in API
-        if not gemini_schools:
-            keyword = "business"  # Fallback keyword
-            # Extract the state and keyword from the user query
-            state = ""
-            if "in" in submitted_query:
-                parts = re.split(r'\bin\b', submitted_query)
-                keyword = parts[0].strip()
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-                else:
-                    state = ""
-
-            st.write(f"State: {state}, Keyword: {keyword}")  # Debug statement
-            results = fetch_college_data(state, keyword)
-            if results:
-                relevant_schools = [college['school.name'] for college in results]
-                st.session_state['relevant_schools'] = relevant_schools
+        # Extract the state and keyword from the user query
+        state = ""
+        if "in" in submitted_query:
+            parts = re.split(r'\bin\b', submitted_query)
+            keyword = parts[0].strip()
+            state_match = re.search(r'\b(\w{2})\b', parts[1])
+            if state_match:
+                state = state_match.group(1).upper()
             else:
-                st.session_state['relevant_schools'] = ["No schools found"]
+                state = ""
+
+        results = fetch_college_data(state, keyword)
+        relevant_schools = [college['school.name'] for college in results] if results else default_relevant_schools
+        if results:
+            st.write(f"Results found for: {keyword} in {state}")
+            for college in results:
+                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
-            st.session_state['relevant_schools'] = gemini_schools
+            st.write(f"No results found for: {keyword}")
 
-        st.write(f"Relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
+        # Display form regardless of results
+        with st.form(key="user_details_form"):
+            st.write("Please fill out the form below to learn more about the colleges.")
+            first_name = st.text_input("First Name")
+            last_name = st.text_input("Last Name")
+            email = st.text_input("Email Address")
+            dob = st.date_input("Date of Birth")
+            graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+            zip_code = st.text_input("5-digit Zip Code")
+            interested_schools = st.multiselect(
+                "Schools you are interested in learning more about:",
+                relevant_schools
+            )
+            submit_button = st.form_submit_button("Submit")
 
-# Display form regardless of results
-if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-    st.write(f"Session state relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
-    with st.form(key="user_details_form"):
-        st.write("Please fill out the form below to learn more about the colleges.")
-        first_name = st.text_input("First Name")
-        last_name = st.text_input("Last Name")
-        email = st.text_input("Email Address")
-        dob = st.date_input("Date of Birth")
-        graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-        zip_code = st.text_input("5-digit Zip Code")
-        interested_schools = st.multiselect(
-            "Schools you are interested in learning more about:",
-            st.session_state['relevant_schools']
-        )
-        st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")  # Debug statement
-        st.write(f"Selected schools before submit: {interested_schools}")  # Debug statement
-        submit_button = st.form_submit_button("Submit")
+            if submit_button:
+                st.write("Form submitted")
+                form_data = {
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "dob": dob.strftime("%Y-%m-%d"),
+                    "graduation_year": graduation_year,
+                    "zip_code": zip_code,
+                    "interested_schools": interested_schools
+                }
+                st.write("Form data: ", form_data)  # Debugging form data
 
-        if submit_button:
-            st.write("Form submitted")
-            form_data = {
-                "first_name": first_name,
-                "last_name": last_name,
-                "email": email,
-                "dob": dob.strftime("%Y-%m-%d"),
-                "graduation_year": graduation_year,
-                "zip_code": zip_code,
-                "interested_schools": interested_schools
-            }
-            st.write("Form data: ", form_data)  # Debugging form data
-
-            # Save conversation history to GitHub
-            history = {
-                "timestamp": datetime.now().isoformat(),
-                "query": submitted_query,
-                "results": st.session_state['relevant_schools'],
-                "form_data": form_data
-            }
-            save_conversation_history_to_github(history)
-            st.success("Your information has been submitted successfully.")
-else:
-    st.write("No schools found. Please ask a different query.")
+                # Save conversation history to GitHub
+                history = {
+                    "timestamp": datetime.now().isoformat(),
+                    "query": submitted_query,
+                    "results": results,
+                    "form_data": form_data
+                }
+                save_conversation_history_to_github(history)
+                st.success("Your information has been submitted successfully.")
