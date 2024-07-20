@@ -162,13 +162,12 @@ with st.form(key="user_details_form"):
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for i, school in enumerate(st.session_state['relevant_schools']):
-            if st.checkbox(school, key=f"{school}_{i}"):
-                selected_schools.append(school)
+            selected_schools.append(st.checkbox(school, key=f"{school}_{i}"))
 
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        if not selected_schools:
+        if not any(selected_schools):
             st.error("Please select at least one school to continue.")
         else:
             st.write("Form submitted")
@@ -179,7 +178,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": selected_schools
+                "interested_schools": [school for school, selected in zip(st.session_state['relevant_schools'], selected_schools) if selected]
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
