@@ -139,6 +139,7 @@ if submitted_query:
             relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
         
         st.session_state['relevant_schools'] = relevant_schools
+        st.write(f"Relevant schools: {relevant_schools}")
 
         if results:
             st.write(f"Results found for: {keyword} in {state}")
