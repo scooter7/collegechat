@@ -160,14 +160,11 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
         zip_code = st.text_input("5-digit Zip Code")
         interested_schools = st.multiselect(
             "Schools you are interested in learning more about:",
-            st.session_state.get('relevant_schools', []),
-            key='interested_schools'
+            st.session_state.get('relevant_schools', [])
         )
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
-            # Update session state with interested schools
-            st.session_state['interested_schools'] = interested_schools
             st.write("Form submitted")
             form_data = {
                 "first_name": first_name,
@@ -176,7 +173,7 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": st.session_state['interested_schools']
+                "interested_schools": interested_schools
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
