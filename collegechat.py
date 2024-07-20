@@ -6,9 +6,21 @@ import json
 from github import Github
 import re
 
-# Store the relevant schools in session state if not already set
+# Dummy data for relevant schools
+default_relevant_schools = [
+    "University of Minnesota - Twin Cities",
+    "Augsburg University",
+    "Carleton College",
+    "Hamline University",
+    "Macalester College",
+    "Saint Mary's University of Minnesota",
+    "Saint Olaf College",
+    "University of Saint Thomas"
+]
+
+# Store the default relevant schools in session state if not already set
 if 'relevant_schools' not in st.session_state:
-    st.session_state['relevant_schools'] = []
+    st.session_state['relevant_schools'] = default_relevant_schools
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -51,17 +63,15 @@ def fetch_college_data(state, keyword):
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
-    try:
-        response = requests.get(url, params=params)
-        st.write(f"College Scorecard API response status code: {response.status_code}")
-        response.raise_for_status()  # This will raise an HTTPError for bad responses
+    response = requests.get(url, params=params)
+    st.write(f"College Scorecard API response status code: {response.status_code}")
+    if response.status_code == 200:
         results = response.json().get('results', [])
         st.write(f"College Scorecard API results: {results}")
         return results
-    except requests.exceptions.HTTPError as http_err:
-        st.error(f"HTTP error occurred: {http_err}")
-    except Exception as err:
-        st.error(f"An error occurred: {err}")
+    else:
+        st.write("Failed to fetch data from College Scorecard API")
+        st.write(f"Response: {response.text}")
     return []
 
 # Function to save conversation history to GitHub
@@ -131,20 +141,15 @@ if submitted_query:
         state = ""
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
-            if len(parts) > 1:
-                keyword = parts[0].strip()
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-                else:
-                    state = ""
-
-        if not state:
-            st.warning("State is not specified in the query. Defaulting to a general search.")
+            keyword = parts[0].strip()
+            state_match = re.search(r'\b(\w{2})\b', parts[1])
+            if state_match:
+                state = state_match.group(1).upper()
+            else:
+                state = ""
 
         results = fetch_college_data(state, keyword)
-        st.session_state['relevant_schools'] = [college['school.name'] for college in results] if results else []
-
+        relevant_schools = [college['school.name'] for college in results] if results else default_relevant_schools
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
@@ -163,7 +168,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                st.session_state['relevant_schools']
+                relevant_schools
             )
             submit_button = st.form_submit_button("Submit")
 
