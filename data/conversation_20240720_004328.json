@@ -1,0 +1,17 @@
+{
+    "timestamp": "2024-07-20T00:43:28.931394",
+    "query": "best nursing schools",
+    "results": [],
+    "form_data": {
+        "first_name": "gf",
+        "last_name": "dfg",
+        "email": "t@est.com",
+        "dob": "2024-07-20",
+        "graduation_year": 1900,
+        "zip_code": "55555",
+        "interested_schools": [
+            "Saint Olaf College",
+            "Macalester College"
+        ]
+    }
+}
