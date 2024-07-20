@@ -148,8 +148,17 @@ if submitted_query:
         else:
             st.write(f"No results found for: {keyword}")
 
-# Form for user details and selecting interested schools
+# Display checkboxes for each school
+selected_schools = []
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+    st.write("Select the schools you are interested in:")
+    for school in st.session_state['relevant_schools']:
+        if st.checkbox(school):
+            selected_schools.append(school)
+
+# Form for user details
+if selected_schools:
+    st.write(f"Selected schools: {selected_schools}")
     with st.form(key="user_details_form"):
         st.write("Please fill out the form below to learn more about the colleges.")
         first_name = st.text_input("First Name")
@@ -158,16 +167,10 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
         dob = st.date_input("Date of Birth")
         graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
         zip_code = st.text_input("5-digit Zip Code")
-        interested_schools = st.multiselect(
-            "Schools you are interested in learning more about:",
-            st.session_state.get('relevant_schools', [])
-        )
-        st.write(f"Selected schools before submit: {interested_schools}")
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
             st.write("Form submitted")
-            st.write(f"Selected schools after submit: {interested_schools}")
             form_data = {
                 "first_name": first_name,
                 "last_name": last_name,
@@ -175,7 +178,7 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": interested_schools
+                "interested_schools": selected_schools
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
