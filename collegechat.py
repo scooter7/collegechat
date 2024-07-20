@@ -135,9 +135,14 @@ if submitted_query:
                 state_match = re.search(r'\b(\w{2})\b', parts[1])
                 if state_match:
                     state = state_match.group(1).upper()
+        
+        st.write(f"Extracted state: {state}")
+        st.write(f"Extracted keyword: {keyword}")
 
         results = fetch_college_data(state, keyword)
         extracted_colleges = extract_college_names(results)
+        st.write(f"Extracted colleges: {extracted_colleges}")
+
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
