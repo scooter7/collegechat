@@ -88,6 +88,7 @@ if submitted_query:
         gemini_response = None
         try:
             gemini_response = interpret_query(submitted_query)
+            st.write(f"Bot Response: {gemini_response.text}")  # Display the bot response
             keyword = gemini_response.text.strip()  # Simplified assumption
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
