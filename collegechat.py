@@ -6,21 +6,9 @@ import json
 from github import Github
 import re
 
-# Dummy data for relevant schools
-default_relevant_schools = [
-    "University of Minnesota - Twin Cities",
-    "Augsburg University",
-    "Carleton College",
-    "Hamline University",
-    "Macalester College",
-    "Saint Mary's University of Minnesota",
-    "Saint Olaf College",
-    "University of Saint Thomas"
-]
-
-# Store the default relevant schools in session state if not already set
+# Store the relevant schools in session state if not already set
 if 'relevant_schools' not in st.session_state:
-    st.session_state['relevant_schools'] = default_relevant_schools
+    st.session_state['relevant_schools'] = []
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -149,7 +137,8 @@ if submitted_query:
                 state = ""
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else default_relevant_schools
+        st.session_state['relevant_schools'] = [college['school.name'] for college in results] if results else []
+
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
@@ -168,7 +157,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                relevant_schools
+                st.session_state['relevant_schools']
             )
             submit_button = st.form_submit_button("Submit")
 
