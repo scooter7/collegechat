@@ -24,6 +24,14 @@ genai.configure(api_key=genai_api_key)
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
+# Map of program keywords
+program_keywords = {
+    "nursing": "nursing",
+    "business": "business",
+    "engineering": "engineering",
+    "computer science": "computer science"
+}
+
 def is_query_allowed(query):
     st.write("Checking if the query contains banned keywords...")
     result = not any(keyword in query.lower() for keyword in banned_keywords)
@@ -38,13 +46,13 @@ def interpret_query(query):
     return response
 
 # Function to fetch data from the College Scorecard API
-def fetch_college_data(state, keyword):
-    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
+def fetch_college_data(state, program):
+    st.write(f"Fetching college data for state: {state}, program: {program}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
         'api_key': college_scorecard_api_key,
         'school.state': state,
-        'school.name': keyword,
+        'latest.programs.cip_4_digit.title': program,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     st.write(f"Request URL: {url}")
@@ -123,13 +131,14 @@ if submitted_query:
             st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            keyword = "engineering"  # Fallback keyword
+            keyword = "nursing"  # Fallback keyword
 
         if not keyword:
-            keyword = "engineering"  # Fallback keyword
+            keyword = "nursing"  # Fallback keyword
 
         # Extract the state and keyword from the user query
         state = ""
+        program = None
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
             keyword = parts[0].strip()
@@ -138,19 +147,28 @@ if submitted_query:
                 if state_match:
                     state = state_match.group(1).upper()
         
-        st.write(f"Extracted state: {state}")
-        st.write(f"Extracted keyword: {keyword}")
+        # Map keyword to program
+        for key in program_keywords:
+            if key in keyword.lower():
+                program = program_keywords[key]
+                break
+        
+        if not program:
+            program = "nursing"  # Fallback program
 
-        results = fetch_college_data(state, keyword)
+        st.write(f"Extracted state: {state}")
+        st.write(f"Extracted program: {program}")
+
+        results = fetch_college_data(state, program)
         extracted_colleges = extract_college_names(results)
         st.write(f"Extracted colleges: {extracted_colleges}")
 
         if results:
-            st.write(f"Results found for: {keyword} in {state}")
+            st.write(f"Results found for: {program} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
-            st.write(f"No results found for: {keyword}")
+            st.write(f"No results found for: {program}")
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
