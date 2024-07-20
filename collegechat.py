@@ -45,14 +45,15 @@ def fetch_college_data(state, keyword):
         'api_key': college_scorecard_api_key,
         'school.state': state,
         'school.name': keyword,
-        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
+        'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall',
+        'per_page': 100  # Increase the number of results returned
     }
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
     if response.status_code == 200:
         results = response.json()
         st.write(f"College Scorecard API raw response: {results}")
-        if 'results' in results:
+        if 'results' in results and results['results']:
             return results['results']
         else:
             st.write("No 'results' field in API response.")
@@ -122,10 +123,10 @@ if submitted_query:
             st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            keyword = "engineering"  # Fallback keyword
+            keyword = "business"  # Fallback keyword
 
         if not keyword:
-            keyword = "engineering"  # Fallback keyword
+            keyword = "business"  # Fallback keyword
 
         # Extract the state and keyword from the user query
         state = ""
@@ -144,7 +145,10 @@ if submitted_query:
             relevant_schools = [college['school.name'] for college in results]
             st.session_state['relevant_schools'] = relevant_schools
         else:
-            st.session_state['relevant_schools'] = ["No schools found"]
+            # Fallback data for demonstration
+            fallback_schools = ["University of Minnesota - Twin Cities", "Augsburg University", "Carleton College", "Hamline University", "Macalester College", "Saint Mary's University of Minnesota", "Saint Olaf College", "University of Saint Thomas"]
+            st.session_state['relevant_schools'] = fallback_schools
+            st.write("No results found, using fallback data.")
 
         st.write(f"Relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
 
