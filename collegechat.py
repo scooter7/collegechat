@@ -89,7 +89,7 @@ if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
-        gemini_response = None
+        gemini_response_text = ""
         try:
             gemini_response_text = interpret_query(submitted_query)
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
