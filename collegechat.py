@@ -136,17 +136,14 @@ if submitted_query:
         results = fetch_college_data(state, keyword)
         if results:
             relevant_schools = [college['school.name'] for college in results]
+            st.session_state['relevant_schools'] = relevant_schools
         else:
-            relevant_schools = ["No schools found"]
+            st.session_state['relevant_schools'] = ["No schools found"]
 
-        st.write(f"Relevant schools: {relevant_schools}")  # Debug statement
-
-        # Store relevant schools in session state for the form
-        st.session_state['relevant_schools'] = relevant_schools
+        st.write(f"Relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
 
 # Display form regardless of results
-if 'relevant_schools' in st.session_state:
-    st.write(f"Session state relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
+if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     with st.form(key="user_details_form"):
         st.write("Please fill out the form below to learn more about the colleges.")
         first_name = st.text_input("First Name")
@@ -159,8 +156,6 @@ if 'relevant_schools' in st.session_state:
             "Schools you are interested in learning more about:",
             st.session_state['relevant_schools']
         )
-        st.write(f"Options in multiselect: {st.session_state['relevant_schools']}")  # Debug statement
-        st.write(f"Selected schools before submit: {interested_schools}")  # Debug statement
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
