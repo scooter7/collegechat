@@ -47,6 +47,8 @@ def fetch_college_data(state, keyword):
         'school.name': keyword,
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
+    st.write(f"Request URL: {url}")
+    st.write(f"Request Params: {params}")
     response = requests.get(url, params=params)
     st.write(f"College Scorecard API response status code: {response.status_code}")
     if response.status_code == 200:
