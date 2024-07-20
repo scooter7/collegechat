@@ -5,3 +5,4 @@ joblib
 google-generativeai
 langchain_google_genai
 PyGithub
+spacy
