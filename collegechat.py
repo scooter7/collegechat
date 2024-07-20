@@ -148,10 +148,6 @@ if submitted_query:
         else:
             st.write(f"No results found for: {keyword}")
 
-# Ensure session state is updated when multi-select is used
-def update_interested_schools(selected_schools):
-    st.session_state['interested_schools'] = selected_schools
-
 # Form for user details and selecting interested schools
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     with st.form(key="user_details_form"):
@@ -162,18 +158,16 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
         dob = st.date_input("Date of Birth")
         graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
         zip_code = st.text_input("5-digit Zip Code")
-
         interested_schools = st.multiselect(
             "Schools you are interested in learning more about:",
             st.session_state.get('relevant_schools', []),
-            key='interested_schools',
-            on_change=update_interested_schools,
-            help="Select schools you are interested in."
+            key='interested_schools'
         )
-
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
+            # Update session state with interested schools
+            st.session_state['interested_schools'] = interested_schools
             st.write("Form submitted")
             form_data = {
                 "first_name": first_name,
@@ -182,7 +176,7 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": st.session_state.get('interested_schools', [])
+                "interested_schools": st.session_state['interested_schools']
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
