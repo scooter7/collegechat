@@ -27,12 +27,16 @@ banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 def is_query_allowed(query):
     return not any(keyword in query.lower() for keyword in banned_keywords)
 
-# Function to interpret the query using Google Gemini
+# Function to interpret the query using Google Gemini with chunking
 def interpret_query(query):
     model = genai.GenerativeModel("gemini-pro")
     chat = model.start_chat(history=[])
-    response = chat.send_message(query)
-    return response
+    chunks = [query[i:i+1000] for i in range(0, len(query), 1000)]
+    responses = []
+    for chunk in chunks:
+        response = chat.send_message(chunk)
+        responses.append(response.text)
+    return ' '.join(responses)
 
 # Function to fetch data from the College Scorecard API
 def fetch_college_data(state, keyword):
@@ -87,9 +91,9 @@ if submitted_query:
     else:
         gemini_response = None
         try:
-            gemini_response = interpret_query(submitted_query)
-            st.write(f"Bot Response: {gemini_response.text}")  # Display the bot response
-            keyword = gemini_response.text.strip()  # Simplified assumption
+            gemini_response_text = interpret_query(submitted_query)
+            st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
+            keyword = gemini_response_text.strip()  # Simplified assumption
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
             keyword = "engineering"  # Fallback keyword
@@ -111,8 +115,8 @@ if submitted_query:
 
         # Extract school names from the Gemini response if available
         relevant_schools = []
-        if gemini_response:
-            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
+        if gemini_response_text:
+            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
         
         st.session_state['relevant_schools'] = relevant_schools
 
