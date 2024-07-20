@@ -148,24 +148,7 @@ if submitted_query:
         else:
             st.write(f"No results found for: {keyword}")
 
-# Initialize selected_schools in session state if not already present
-if 'selected_schools' not in st.session_state:
-    st.session_state['selected_schools'] = []
-
-# Display checkboxes for each school
-if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-    st.write("Select the schools you are interested in:")
-    selected_schools = st.session_state['selected_schools']
-    for i, school in enumerate(st.session_state['relevant_schools']):
-        if st.checkbox(school, key=f"{school}_{i}"):
-            if school not in selected_schools:
-                selected_schools.append(school)
-        else:
-            if school in selected_schools:
-                selected_schools.remove(school)
-    st.session_state['selected_schools'] = selected_schools
-
-# Always show form for user details
+# Always show form for user details and selected schools
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
     first_name = st.text_input("First Name")
@@ -174,10 +157,18 @@ with st.form(key="user_details_form"):
     dob = st.date_input("Date of Birth")
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
+
+    selected_schools = []
+    if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+        st.write("Select the schools you are interested in:")
+        for i, school in enumerate(st.session_state['relevant_schools']):
+            if st.checkbox(school, key=f"{school}_{i}"):
+                selected_schools.append(school)
+
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        if not st.session_state['selected_schools']:
+        if not selected_schools:
             st.error("Please select at least one school to continue.")
         else:
             st.write("Form submitted")
@@ -188,7 +179,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": st.session_state['selected_schools']
+                "interested_schools": selected_schools
             }
             st.write("Form data: ", form_data)  # Debugging form data
 
