@@ -133,13 +133,16 @@ if submitted_query:
                 state = ""
 
         results = fetch_college_data(state, keyword)
-        relevant_schools = [college['school.name'] for college in results] if results else []
+        relevant_schools = [college['school.name'] for college in results] if results else ["No schools found"]
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
             st.write(f"No results found for: {keyword}")
+
+        # Store relevant schools in session state for the form
+        st.session_state['relevant_schools'] = relevant_schools
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
@@ -152,7 +155,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                relevant_schools
+                st.session_state.get('relevant_schools', [])
             )
             submit_button = st.form_submit_button("Submit")
 
