@@ -112,20 +112,17 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
-            gemini_text = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Gemini response: {gemini_text}")
-            
-            # Extract bolded school names
-            bolded_schools = re.findall(r'\*\*(.*?)\*\*', gemini_text)
-            st.session_state['relevant_schools'] = bolded_schools if bolded_schools else []
-            st.write(f"Relevant schools extracted: {st.session_state['relevant_schools']}")
+            keyword = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using keyword from Gemini: {keyword}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            st.session_state['relevant_schools'] = []
+            keyword = "engineering"  # Fallback keyword
+
+        if not keyword:
+            keyword = "engineering"  # Fallback keyword
 
         # Extract the state and keyword from the user query
         state = ""
-        keyword = submitted_query.strip()
         if "in" in submitted_query:
             parts = re.split(r'\bin\b', submitted_query)
             if len(parts) > 1:
@@ -135,6 +132,10 @@ if submitted_query:
                     state = state_match.group(1).upper()
 
         results = fetch_college_data(state, keyword)
+        relevant_schools = [college['school.name'] for college in results] if results else []
+
+        st.session_state['relevant_schools'] = relevant_schools
+
         if results:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
