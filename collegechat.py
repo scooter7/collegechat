@@ -25,10 +25,7 @@ genai.configure(api_key=genai_api_key)
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
 def is_query_allowed(query):
-    st.write("Checking if the query contains banned keywords...")
-    result = not any(keyword in query.lower() for keyword in banned_keywords)
-    st.write(f"Query allowed: {result}")
-    return result
+    return not any(keyword in query.lower() for keyword in banned_keywords)
 
 # Function to interpret the query using Google Gemini
 def interpret_query(query):
@@ -39,7 +36,6 @@ def interpret_query(query):
 
 # Function to fetch data from the College Scorecard API
 def fetch_college_data(state, keyword):
-    st.write(f"Fetching college data for state: {state}, keyword: {keyword}...")
     url = 'https://api.data.gov/ed/collegescorecard/v1/schools'
     params = {
         'api_key': college_scorecard_api_key,
@@ -48,50 +44,31 @@ def fetch_college_data(state, keyword):
         'fields': 'school.name,school.city,school.state,latest.admissions.admission_rate.overall'
     }
     response = requests.get(url, params=params)
-    st.write(f"College Scorecard API response status code: {response.status_code}")
     if response.status_code == 200:
-        results = response.json().get('results', [])
-        st.write(f"College Scorecard API results: {results}")
-        return results
-    else:
-        st.write("Failed to fetch data from College Scorecard API")
-        st.write(f"Response: {response.text}")
+        return response.json().get('results', [])
     return []
 
 # Function to save conversation history to GitHub
 def save_conversation_history_to_github(history):
-    st.write("Saving conversation history to GitHub...")
     file_content = json.dumps(history, indent=4)
     file_name = f"conversation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     repo_name = "scooter7/collegechat"  # Replace with your repository name
     folder_path = "data"  # Folder in the repository
 
-    st.write(f"File content: {file_content}")
-    st.write(f"File name: {file_name}")
-    st.write(f"Repository name: {repo_name}")
-    st.write(f"Folder path: {folder_path}")
-
-    # Initialize Github instance
     try:
         g = Github(github_token)
-        st.write("GitHub instance created.")
         repo = g.get_repo(repo_name)
-        st.write(f"Authenticated to GitHub repository: {repo_name}")
 
         # Check if the folder exists
         try:
-            contents = repo.get_contents(folder_path)
-            st.write(f"Folder {folder_path} exists in the repository.")
+            repo.get_contents(folder_path)
         except:
-            st.write(f"Folder {folder_path} does not exist in the repository. Creating the folder.")
             repo.create_file(f"{folder_path}/.gitkeep", "Create folder", "")
         
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
-        st.write(f"File {file_name} saved to GitHub repository {repo_name}")
     except Exception as e:
-        st.write(f"Failed to save file to GitHub: {e}")
-        st.write(f"Error details: {e}")
+        st.error(f"Failed to save file to GitHub: {e}")
 
 # Streamlit app UI
 st.title('College Information Assistant')
@@ -105,17 +82,15 @@ if st.button("Ask"):
         submitted_query = query
 
 if submitted_query:
-    st.write(f"User query: {submitted_query}")
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
         gemini_response = None
         try:
             gemini_response = interpret_query(submitted_query)
-            st.write(f"Gemini response: {gemini_response.text}")
             keyword = gemini_response.text.strip()  # Simplified assumption
         except Exception as e:
-            st.write(f"Error interacting with Gemini: {e}")
+            st.error(f"Error interacting with Gemini: {e}")
             keyword = "engineering"  # Fallback keyword
 
         if not keyword:
@@ -139,10 +114,8 @@ if submitted_query:
             relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
         
         st.session_state['relevant_schools'] = relevant_schools
-        st.write(f"Relevant schools: {relevant_schools}")
 
         if results:
-            st.write(f"Results found for: {keyword} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
@@ -170,7 +143,6 @@ with st.form(key="user_details_form"):
         if not any(selected_schools):
             st.error("Please select at least one school to continue.")
         else:
-            st.write("Form submitted")
             form_data = {
                 "first_name": first_name,
                 "last_name": last_name,
@@ -180,7 +152,6 @@ with st.form(key="user_details_form"):
                 "zip_code": zip_code,
                 "interested_schools": [school for school, selected in zip(st.session_state['relevant_schools'], selected_schools) if selected]
             }
-            st.write("Form data: ", form_data)  # Debugging form data
 
             # Save conversation history to GitHub
             history = {
