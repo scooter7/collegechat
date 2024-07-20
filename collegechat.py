@@ -162,10 +162,12 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
             "Schools you are interested in learning more about:",
             st.session_state.get('relevant_schools', [])
         )
+        st.write(f"Selected schools before submit: {interested_schools}")
         submit_button = st.form_submit_button("Submit")
 
         if submit_button:
             st.write("Form submitted")
+            st.write(f"Selected schools after submit: {interested_schools}")
             form_data = {
                 "first_name": first_name,
                 "last_name": last_name,
