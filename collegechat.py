@@ -5,6 +5,10 @@ import google.generativeai as genai
 import json
 from github import Github
 import re
+import spacy
+
+# Load spaCy model
+nlp = spacy.load("en_core_web_sm")
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -57,6 +61,12 @@ def fetch_college_data(state, keyword):
         st.write("Failed to fetch data from College Scorecard API")
         st.write(f"Response: {response.text}")
     return []
+
+# Function to extract college/university names using spaCy
+def extract_college_names(text):
+    doc = nlp(text)
+    colleges = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
+    return colleges
 
 # Function to save conversation history to GitHub
 def save_conversation_history_to_github(history):
@@ -137,8 +147,12 @@ if submitted_query:
             st.write(f"Results found for: {keyword} in {state}")
             for college in results:
                 st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            # Extract college names using spaCy
+            results_text = " ".join([college['school.name'] for college in results])
+            extracted_colleges = extract_college_names(results_text)
         else:
             st.write(f"No results found for: {keyword}")
+            extracted_colleges = []
 
         # Display form regardless of results
         with st.form(key="user_details_form"):
@@ -151,7 +165,7 @@ if submitted_query:
             zip_code = st.text_input("5-digit Zip Code")
             interested_schools = st.multiselect(
                 "Schools you are interested in learning more about:",
-                relevant_schools
+                extracted_colleges
             )
             submit_button = st.form_submit_button("Submit")
 
