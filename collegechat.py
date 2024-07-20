@@ -109,7 +109,7 @@ if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
-        # Interpret the query with Gemini
+        gemini_response = None
         try:
             gemini_response = interpret_query(submitted_query)
             st.write(f"Gemini response: {gemini_response.text}")
@@ -133,8 +133,10 @@ if submitted_query:
 
         results = fetch_college_data(state, keyword)
 
-        # Extract school names from the response text (assuming it's in a structured format)
-        relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
+        # Extract school names from the Gemini response if available
+        relevant_schools = []
+        if gemini_response:
+            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response.text)
         
         st.session_state['relevant_schools'] = relevant_schools
 
