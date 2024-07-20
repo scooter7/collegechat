@@ -119,36 +119,40 @@ if submitted_query:
         # Interpret the query with Gemini
         try:
             gemini_response = interpret_query(submitted_query)
-            keyword = gemini_response.text.strip()  # Simplified assumption
-            st.write(f"Using keyword from Gemini: {keyword}")
+            interpreted_response = gemini_response.text.strip()  # Simplified assumption
+            st.write(f"Using interpreted response from Gemini: {interpreted_response}")
         except Exception as e:
             st.write(f"Error interacting with Gemini: {e}")
-            keyword = "business"  # Fallback keyword
+            interpreted_response = ""
 
-        if not keyword:
-            keyword = "business"  # Fallback keyword
+        # Extract schools from the interpreted response
+        school_pattern = re.compile(r'\d+\.\s+([^()]+)\s+\([^()]+\)')
+        gemini_schools = school_pattern.findall(interpreted_response)
+        st.write(f"Extracted schools from Gemini response: {gemini_schools}")
 
-        # Extract the state and keyword from the user query
-        state = ""
-        if "in" in submitted_query:
-            parts = re.split(r'\bin\b', submitted_query)
-            keyword = parts[0].strip()
-            state_match = re.search(r'\b(\w{2})\b', parts[1])
-            if state_match:
-                state = state_match.group(1).upper()
+        # If no schools found in Gemini response, fallback to keyword search in API
+        if not gemini_schools:
+            keyword = "business"  # Fallback keyword
+            # Extract the state and keyword from the user query
+            state = ""
+            if "in" in submitted_query:
+                parts = re.split(r'\bin\b', submitted_query)
+                keyword = parts[0].strip()
+                state_match = re.search(r'\b(\w{2})\b', parts[1])
+                if state_match:
+                    state = state_match.group(1).upper()
+                else:
+                    state = ""
+
+            st.write(f"State: {state}, Keyword: {keyword}")  # Debug statement
+            results = fetch_college_data(state, keyword)
+            if results:
+                relevant_schools = [college['school.name'] for college in results]
+                st.session_state['relevant_schools'] = relevant_schools
             else:
-                state = ""
-
-        st.write(f"State: {state}, Keyword: {keyword}")  # Debug statement
-        results = fetch_college_data(state, keyword)
-        if results:
-            relevant_schools = [college['school.name'] for college in results]
-            st.session_state['relevant_schools'] = relevant_schools
+                st.session_state['relevant_schools'] = ["No schools found"]
         else:
-            # Fallback data for demonstration
-            fallback_schools = ["University of Minnesota - Twin Cities", "Augsburg University", "Carleton College", "Hamline University", "Macalester College", "Saint Mary's University of Minnesota", "Saint Olaf College", "University of Saint Thomas"]
-            st.session_state['relevant_schools'] = fallback_schools
-            st.write("No results found, using fallback data.")
+            st.session_state['relevant_schools'] = gemini_schools
 
         st.write(f"Relevant schools: {st.session_state['relevant_schools']}")  # Debug statement
 
