@@ -132,14 +132,19 @@ if submitted_query:
         st.write("Extracted Schools:", relevant_schools)
         st.session_state['relevant_schools'] = relevant_schools
 
+# Ensure session state is initialized for each school
+if 'relevant_schools' in st.session_state:
+    for idx, school in enumerate(st.session_state['relevant_schools']):
+        if f"school_{idx}_selected" not in st.session_state:
+            st.session_state[f"school_{idx}_selected"] = False
+
+def update_checkbox(key):
+    st.session_state[key] = not st.session_state[key]
+
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
-    selected_schools = []
     for idx, school in enumerate(st.session_state['relevant_schools']):
-        selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state.get(f"school_{idx}_selected", False))
-        st.session_state[f"school_{idx}_selected"] = selected
-        if selected:
-            selected_schools.append(school)
+        selected = st.checkbox(school, key=f"school_{idx}_selected", on_change=update_checkbox, args=(f"school_{idx}_selected",))
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
