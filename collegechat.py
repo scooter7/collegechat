@@ -63,12 +63,12 @@ def save_conversation_history_to_github(history):
         g = Github(github_token)
         repo = g.get_repo(repo_name)
 
-        # Check if the folder exists
+        # Check if the folder exists, if not create it
         try:
             repo.get_contents(folder_path)
         except:
             repo.create_file(f"{folder_path}/.gitkeep", "Create folder", "")
-        
+
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
     except Exception as e:
@@ -139,10 +139,7 @@ with st.form(key="user_details_form"):
     selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
-        for school in st.session_state['relevant_schools']:
-            selected = st.checkbox(school, key=school)
-            if selected:
-                selected_schools.append(school)
+        selected_schools = st.multiselect("Schools", st.session_state['relevant_schools'])
 
     submit_button = st.form_submit_button("Submit")
 
