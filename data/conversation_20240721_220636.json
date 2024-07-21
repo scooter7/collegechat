@@ -1,0 +1,28 @@
+{
+    "timestamp": "2024-07-21T22:06:36.675425",
+    "query": "online mba programs in Iowa",
+    "results": [
+        "Iowa Wesleyan University",
+        "University of Iowa Tippie College",
+        "William Penn University",
+        "Central College",
+        "Wartburg College",
+        "Iowa State University",
+        "Upper Iowa University",
+        "Grand View University",
+        "Drake University"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@ve.com",
+        "dob": "1974-02-12",
+        "graduation_year": 2006,
+        "zip_code": "52403",
+        "interested_schools": [
+            "University of Iowa Tippie College",
+            "Iowa State University",
+            "Drake University"
+        ]
+    }
+}
