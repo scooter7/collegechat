@@ -102,7 +102,11 @@ if submitted_query:
             # Extract unique, valid school names
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
             relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
-            st.session_state['relevant_schools'] = relevant_schools
+            # Initialize relevant_schools in session state if not already present
+            if 'relevant_schools' not in st.session_state:
+                st.session_state['relevant_schools'] = relevant_schools
+            else:
+                st.session_state['relevant_schools'] = list(set(st.session_state['relevant_schools'] + relevant_schools))
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
@@ -130,7 +134,7 @@ if submitted_query:
                 st.write(f"No results found for: {keyword}")
 
         # Debugging: Check the extracted school names
-        st.write("Extracted Schools:", relevant_schools)
+        st.write("Extracted Schools:", st.session_state['relevant_schools'])
 
 # Ensure session state is initialized for selected schools
 if 'selected_schools' not in st.session_state:
