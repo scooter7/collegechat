@@ -1,0 +1,26 @@
+{
+    "timestamp": "2024-07-21T15:36:30.164982",
+    "query": "best nursing schools",
+    "results": [
+        "Vanderbilt University",
+        "Emory University",
+        "New York University",
+        " Rory Meyers College",
+        "Columbia University",
+        "Duke University",
+        "Johns Hopkins University"
+    ],
+    "form_data": {
+        "first_name": "Jay",
+        "last_name": "Vee",
+        "email": "j@ve.com",
+        "dob": "2024-07-21",
+        "graduation_year": 1900,
+        "zip_code": "52403",
+        "interested_schools": [
+            "New York University",
+            "Emory University",
+            "Columbia University"
+        ]
+    }
+}
