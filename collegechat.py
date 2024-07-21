@@ -99,7 +99,9 @@ if submitted_query:
         try:
             gemini_response_text = interpret_query(submitted_query)
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
-            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
+            # Extract unique, valid school names
+            relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
+            relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
