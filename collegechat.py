@@ -138,13 +138,15 @@ if 'relevant_schools' in st.session_state:
         if f"school_{idx}_selected" not in st.session_state:
             st.session_state[f"school_{idx}_selected"] = False
 
-def update_checkbox(key):
-    st.session_state[key] = not st.session_state[key]
-
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-    st.write("Select the schools you are interested in:")
-    for idx, school in enumerate(st.session_state['relevant_schools']):
-        selected = st.checkbox(school, key=f"school_{idx}_selected", on_change=update_checkbox, args=(f"school_{idx}_selected",))
+    selected_schools = st.multiselect(
+        "Select the schools you are interested in:",
+        options=st.session_state['relevant_schools'],
+        default=[school for school in st.session_state['relevant_schools'] if st.session_state.get(f"school_{idx}_selected", False)]
+    )
+
+    for school in st.session_state['relevant_schools']:
+        st.session_state[f"school_{idx}_selected"] = school in selected_schools
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
@@ -159,9 +161,8 @@ with st.form(key="user_details_form"):
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        # Ensure all selected schools are captured
-        selected_schools = [school for idx, school in enumerate(st.session_state['relevant_schools']) if st.session_state.get(f"school_{idx}_selected", False)]
-        st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
+        st.write("Form submitted")
+        st.write(f"Selected schools after submit: {selected_schools}")
         if not selected_schools:
             st.error("Please select at least one school to continue.")
         else:
@@ -184,6 +185,3 @@ with st.form(key="user_details_form"):
             }
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
-
-        # Debugging: Check selected schools after submission
-        st.write("Selected Schools (after check):", selected_schools)
