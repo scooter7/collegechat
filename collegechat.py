@@ -35,7 +35,11 @@ def interpret_query(query):
     responses = []
     for chunk in chunks:
         response = chat.send_message(chunk)
-        responses.append(response.text)
+        if 'text' in response:
+            responses.append(response['text'])
+        else:
+            st.error(f"Error interacting with Gemini: {response.get('finish_reason', 'Unknown error')}")
+            break
     return ' '.join(responses)
 
 # Function to fetch data from the College Scorecard API
@@ -90,47 +94,39 @@ if submitted_query:
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
         gemini_response_text = ""
+        relevant_schools = []
+
         try:
             gemini_response_text = interpret_query(submitted_query)
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
-            keyword = gemini_response_text.strip()  # Simplified assumption
+            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
+
+        if not relevant_schools:
             keyword = "engineering"  # Fallback keyword
+            if "in" in submitted_query:
+                parts = re.split(r'\bin\b', submitted_query)
+                if len(parts) > 1:
+                    keyword = parts[0].strip()
+                    state_match = re.search(r'\b(\w{2})\b', parts[1])
+                    if state_match:
+                        state = state_match.group(1).upper()
+            else:
+                state = ""
+            
+            results = fetch_college_data(state, keyword)
+            if results:
+                for college in results:
+                    school_name = college['school.name']
+                    if school_name not in relevant_schools:
+                        relevant_schools.append(school_name)
+                    st.write(f"Name: {school_name}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            else:
+                st.write(f"No results found for: {keyword}")
 
-        if not keyword:
-            keyword = "engineering"  # Fallback keyword
-
-        # Extract the state and keyword from the user query
-        state = ""
-        if "in" in submitted_query:
-            parts = re.split(r'\bin\b', submitted_query)
-            if len(parts) > 1:
-                keyword = parts[0].strip()
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
-
-        results = fetch_college_data(state, keyword)
-
-        # Extract school names from the Gemini response if available
-        relevant_schools = []
-        if gemini_response_text:
-            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
-        
         # Debugging: Check the extracted school names
         st.write("Extracted Schools:", relevant_schools)
-
-        # Ensure results are handled correctly
-        if results:
-            for college in results:
-                school_name = college['school.name']
-                if school_name not in relevant_schools:
-                    relevant_schools.append(school_name)
-                st.write(f"Name: {school_name}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-        else:
-            st.write(f"No results found for: {keyword}")
-
         st.session_state['relevant_schools'] = relevant_schools
 
 # Always show form for user details and selected schools
@@ -173,7 +169,7 @@ with st.form(key="user_details_form"):
             history = {
                 "timestamp": datetime.now().isoformat(),
                 "query": submitted_query,
-                "results": results,
+                "results": st.session_state.get('relevant_schools', []),
                 "form_data": form_data
             }
             save_conversation_history_to_github(history)
