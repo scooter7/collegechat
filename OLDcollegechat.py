@@ -35,7 +35,11 @@ def interpret_query(query):
     responses = []
     for chunk in chunks:
         response = chat.send_message(chunk)
-        responses.append(response.text)
+        if hasattr(response, 'text'):
+            responses.append(response.text)
+        else:
+            st.error(f"Error interacting with Gemini: {getattr(response, 'finish_reason', 'Unknown error')}")
+            break
     return ' '.join(responses)
 
 # Function to fetch data from the College Scorecard API
@@ -63,12 +67,12 @@ def save_conversation_history_to_github(history):
         g = Github(github_token)
         repo = g.get_repo(repo_name)
 
-        # Check if the folder exists
+        # Check if the folder exists, if not create it
         try:
             repo.get_contents(folder_path)
         except:
             repo.create_file(f"{folder_path}/.gitkeep", "Create folder", "")
-        
+
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
     except Exception as e:
@@ -90,41 +94,41 @@ if submitted_query:
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
         gemini_response_text = ""
+        relevant_schools = []
+
         try:
             gemini_response_text = interpret_query(submitted_query)
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
-            keyword = gemini_response_text.strip()  # Simplified assumption
+            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
-            keyword = "engineering"  # Fallback keyword
 
-        if not keyword:
-            keyword = "engineering"  # Fallback keyword
-
-        # Extract the state and keyword from the user query
+        # Define state and keyword with default values
         state = ""
-        if "in" in submitted_query:
-            parts = re.split(r'\bin\b', submitted_query)
-            if len(parts) > 1:
-                keyword = parts[0].strip()
-                state_match = re.search(r'\b(\w{2})\b', parts[1])
-                if state_match:
-                    state = state_match.group(1).upper()
+        keyword = "engineering"  # Default fallback keyword
 
-        results = fetch_college_data(state, keyword)
+        if not relevant_schools:
+            if "in" in submitted_query:
+                parts = re.split(r'\bin\b', submitted_query)
+                if len(parts) > 1:
+                    keyword = parts[0].strip()
+                    state_match = re.search(r'\b(\w{2})\b', parts[1])
+                    if state_match:
+                        state = state_match.group(1).upper()
 
-        # Extract school names from the Gemini response if available
-        relevant_schools = []
-        if gemini_response_text:
-            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
-        
+            results = fetch_college_data(state, keyword)
+            if results:
+                for college in results:
+                    school_name = college['school.name']
+                    if school_name not in relevant_schools:
+                        relevant_schools.append(school_name)
+                    st.write(f"Name: {school_name}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+            else:
+                st.write(f"No results found for: {keyword}")
+
+        # Debugging: Check the extracted school names
+        st.write("Extracted Schools:", relevant_schools)
         st.session_state['relevant_schools'] = relevant_schools
-
-        if results:
-            for college in results:
-                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-        else:
-            st.write(f"No results found for: {keyword}")
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
@@ -140,9 +144,11 @@ with st.form(key="user_details_form"):
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for school in st.session_state['relevant_schools']:
-            selected = st.checkbox(school, key=school)
+            selected = st.checkbox(school, key=f"school_{school}")
             if selected:
                 selected_schools.append(school)
+        # Debugging: Check the state of checkboxes
+        st.write("Checkbox States:", {f"school_{school}": st.session_state.get(f"school_{school}", False) for school in st.session_state['relevant_schools']})
 
     submit_button = st.form_submit_button("Submit")
 
@@ -164,8 +170,11 @@ with st.form(key="user_details_form"):
             history = {
                 "timestamp": datetime.now().isoformat(),
                 "query": submitted_query,
-                "results": results,
+                "results": st.session_state.get('relevant_schools', []),
                 "form_data": form_data
             }
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
+
+        # Debugging: Check selected schools
+        st.write("Selected Schools:", selected_schools)
