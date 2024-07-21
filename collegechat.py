@@ -147,10 +147,7 @@ with st.form(key="user_details_form"):
             if f"school_{idx}_selected" not in st.session_state:
                 st.session_state[f"school_{idx}_selected"] = False
             selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state[f"school_{idx}_selected"])
-            if selected != st.session_state[f"school_{idx}_selected"]:
-                st.session_state[f"school_{idx}_selected"] = selected
-            if selected:
-                selected_schools.append(school)
+            st.session_state[f"school_{idx}_selected"] = selected
 
     submit_button = st.form_submit_button("Submit")
 
