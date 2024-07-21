@@ -89,7 +89,7 @@ if st.button("Ask"):
         st.session_state['submitted_query'] = query
         submitted_query = query
 
-if submitted_query:
+if submitted_query and 'relevant_schools' not in st.session_state:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
@@ -102,36 +102,10 @@ if submitted_query:
             # Extract unique, valid school names
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
             relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
-            # Initialize relevant_schools in session state if not already present
-            if 'relevant_schools' not in st.session_state:
-                st.session_state['relevant_schools'] = relevant_schools
-            else:
-                st.session_state['relevant_schools'] = list(set(st.session_state['relevant_schools'] + relevant_schools))
+            # Initialize relevant_schools in session state
+            st.session_state['relevant_schools'] = relevant_schools
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
-
-        # Define state and keyword with default values
-        state = ""
-        keyword = "engineering"  # Default fallback keyword
-
-        if not relevant_schools:
-            if "in" in submitted_query:
-                parts = re.split(r'\bin\b', submitted_query)
-                if len(parts) > 1:
-                    keyword = parts[0].strip()
-                    state_match = re.search(r'\b(\w{2})\b', parts[1])
-                    if state_match:
-                        state = state_match.group(1).upper()
-
-            results = fetch_college_data(state, keyword)
-            if results:
-                for college in results:
-                    school_name = college['school.name']
-                    if school_name not in relevant_schools:
-                        relevant_schools.append(school_name)
-                    st.write(f"Name: {school_name}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
-            else:
-                st.write(f"No results found for: {keyword}")
 
         # Debugging: Check the extracted school names
         st.write("Extracted Schools:", st.session_state['relevant_schools'])
