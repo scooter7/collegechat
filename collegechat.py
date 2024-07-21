@@ -116,7 +116,7 @@ if submitted_query:
         # Extract school names from the Gemini response if available
         relevant_schools = []
         if gemini_response_text:
-            relevant_schools = re.findall(r'\b[A-Z][\w\s]*\b(?:University|College)\b', gemini_response_text)
+            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
         
         st.session_state['relevant_schools'] = relevant_schools
 
@@ -127,8 +127,6 @@ if submitted_query:
             st.write(f"No results found for: {keyword}")
 
 # Always show form for user details and selected schools
-selected_schools = st.session_state.get('selected_schools', [])
-
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
     first_name = st.text_input("First Name")
@@ -138,16 +136,13 @@ with st.form(key="user_details_form"):
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
 
+    selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
-        checkbox_states = {}
-        for i, school in enumerate(st.session_state['relevant_schools']):
-            key = f"{school}_{i}"
-            if key not in st.session_state:
-                st.session_state[key] = False
-            checkbox_states[school] = st.checkbox(school, key=key, value=st.session_state[key])
-        selected_schools = [school for school, selected in checkbox_states.items() if selected]
-        st.session_state['selected_schools'] = selected_schools  # Save state of selected schools
+        for school in st.session_state['relevant_schools']:
+            selected = st.checkbox(school, key=school)
+            if selected:
+                selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
 
