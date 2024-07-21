@@ -147,7 +147,6 @@ with st.form(key="user_details_form"):
             if selected:
                 selected_schools.append(school)
 
-    st.write(f"Selected schools: {selected_schools}")  # Debugging statement to show selected schools
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
@@ -171,6 +170,5 @@ with st.form(key="user_details_form"):
                 "results": results,
                 "form_data": form_data
             }
-            st.write(f"Form data: {form_data}")  # Debugging statement to check form data
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
