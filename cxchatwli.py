@@ -141,6 +141,11 @@ def login_screen():
 def main_app():
     st.title('College Information Assistant')
 
+    if st.button("Logout"):
+        del st.session_state['username']
+        del st.session_state['profile']
+        st.experimental_rerun()
+
     query = st.text_input("Ask about colleges:")
     submitted_query = st.session_state.get('submitted_query', '')
 
@@ -167,8 +172,9 @@ def main_app():
                 # Extract unique, valid school names
                 relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
                 relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
-                # Initialize relevant_schools in session state
-                st.session_state['relevant_schools'] = relevant_schools
+                # Initialize relevant_schools in session state if not already set
+                if 'relevant_schools' not in st.session_state or not st.session_state['relevant_schools']:
+                    st.session_state['relevant_schools'] = relevant_schools
             except Exception as e:
                 st.error(f"Error interacting with Gemini: {e}")
 
