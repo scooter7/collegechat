@@ -1,0 +1,32 @@
+{
+    "timestamp": "2024-07-21T23:33:21.712459",
+    "query": "best nursing schools",
+    "results": [
+        "Duke University",
+        "Rush University",
+        "Yale University",
+        "Villanova University",
+        "DePaul University",
+        "Harvard University",
+        "QS World University",
+        "New York University",
+        "Emory University",
+        "Times Higher Education World University",
+        "Johns Hopkins University"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "v",
+        "email": "t@a.org",
+        "dob": "1999-07-21",
+        "graduation_year": 2004,
+        "zip_code": "52403",
+        "interested_schools": [
+            "Cornell University",
+            "New York University",
+            "Baruch College",
+            "Columbia University",
+            "Emory University"
+        ]
+    }
+}
