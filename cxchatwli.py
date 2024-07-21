@@ -110,6 +110,13 @@ def login_screen():
             else:
                 st.error("Invalid username or password")
     else:
+        first_name = st.text_input("First Name")
+        last_name = st.text_input("Last Name")
+        email = st.text_input("Email Address")
+        dob = st.date_input("Date of Birth", value=datetime.now())
+        graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
+        zip_code = st.text_input("5-digit Zip Code")
+
         if st.button("Sign Up"):
             if load_user_profile(username):
                 st.error("Username already exists")
@@ -117,35 +124,18 @@ def login_screen():
                 user_profile = {
                     "username": username,
                     "password": password,
-                    "first_name": "",
-                    "last_name": "",
-                    "email": "",
-                    "dob": "",
-                    "graduation_year": 1900,
-                    "zip_code": "",
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "dob": dob.strftime("%Y-%m-%d"),
+                    "graduation_year": graduation_year,
+                    "zip_code": zip_code,
                     "selected_schools": []
                 }
                 save_user_profile(username, user_profile)
                 st.session_state['username'] = username
                 st.session_state['profile'] = user_profile
                 st.success("Signed up successfully")
-
-# Profile Creation Screen
-def profile_creation_screen():
-    st.title("Create Your Profile")
-    profile = st.session_state['profile']
-    profile["first_name"] = st.text_input("First Name", value=profile["first_name"])
-    profile["last_name"] = st.text_input("Last Name", value=profile["last_name"])
-    profile["email"] = st.text_input("Email Address", value=profile["email"])
-    profile["dob"] = st.date_input("Date of Birth", value=datetime.strptime(profile["dob"], "%Y-%m-%d") if profile["dob"] else datetime.now())
-    profile["graduation_year"] = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1, value=profile["graduation_year"])
-    profile["zip_code"] = st.text_input("5-digit Zip Code", value=profile["zip_code"])
-
-    if st.button("Save Profile"):
-        profile["dob"] = profile["dob"].strftime("%Y-%m-%d")
-        save_user_profile(st.session_state['username'], profile)
-        st.session_state['profile'] = profile
-        st.success("Profile saved successfully")
 
 # Main App
 def main_app():
@@ -243,7 +233,5 @@ def main_app():
 # Main Logic
 if 'username' not in st.session_state:
     login_screen()
-elif 'profile' not in st.session_state or not st.session_state['profile']:
-    profile_creation_screen()
 else:
     main_app()
