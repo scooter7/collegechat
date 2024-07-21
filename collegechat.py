@@ -140,12 +140,14 @@ with st.form(key="user_details_form"):
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for i, school in enumerate(st.session_state['relevant_schools']):
-            selected_schools.append(st.checkbox(school, key=f"{school}_{i}"))
+            selected = st.checkbox(school, key=f"{school}_{i}")
+            if selected:
+                selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        if not any(selected_schools):
+        if not selected_schools:
             st.error("Please select at least one school to continue.")
         else:
             form_data = {
@@ -155,7 +157,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": [school for school, selected in zip(st.session_state['relevant_schools'], selected_schools) if selected]
+                "interested_schools": selected_schools
             }
 
             # Save conversation history to GitHub
