@@ -35,10 +35,10 @@ def interpret_query(query):
     responses = []
     for chunk in chunks:
         response = chat.send_message(chunk)
-        if 'text' in response:
-            responses.append(response['text'])
+        if hasattr(response, 'text'):
+            responses.append(response.text)
         else:
-            st.error(f"Error interacting with Gemini: {response.get('finish_reason', 'Unknown error')}")
+            st.error(f"Error interacting with Gemini: {getattr(response, 'finish_reason', 'Unknown error')}")
             break
     return ' '.join(responses)
 
