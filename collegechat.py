@@ -140,8 +140,14 @@ with st.form(key="user_details_form"):
 
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
-        checkbox_states = {school: st.checkbox(school, key=school) for school in st.session_state['relevant_schools']}
+        checkbox_states = {}
+        for i, school in enumerate(st.session_state['relevant_schools']):
+            key = f"{school}_{i}"
+            if key not in st.session_state:
+                st.session_state[key] = False
+            checkbox_states[school] = st.checkbox(school, key=key, value=st.session_state[key])
         selected_schools = [school for school, selected in checkbox_states.items() if selected]
+        st.session_state['selected_schools'] = selected_schools  # Save state of selected schools
 
     submit_button = st.form_submit_button("Submit")
 
@@ -166,6 +172,5 @@ with st.form(key="user_details_form"):
                 "results": results,
                 "form_data": form_data
             }
-            st.session_state['selected_schools'] = selected_schools  # Save state of selected schools
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
