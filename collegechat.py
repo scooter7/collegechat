@@ -142,17 +142,19 @@ with st.form(key="user_details_form"):
 
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
+        selected_schools = []
         for idx, school in enumerate(st.session_state['relevant_schools']):
             if f"school_{idx}_selected" not in st.session_state:
                 st.session_state[f"school_{idx}_selected"] = False
             selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state[f"school_{idx}_selected"])
             st.session_state[f"school_{idx}_selected"] = selected
+            if selected:
+                selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
         # Ensure all selected schools are captured
-        selected_schools = [school for idx, school in enumerate(st.session_state['relevant_schools']) if st.session_state.get(f"school_{idx}_selected", False)]
         st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
         if not selected_schools:
             st.error("Please select at least one school to continue.")
