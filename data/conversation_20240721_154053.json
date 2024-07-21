@@ -1,0 +1,26 @@
+{
+    "timestamp": "2024-07-21T15:40:53.943373",
+    "query": "best nursing schools",
+    "results": [
+        "Johns Hopkins University",
+        "Yale University",
+        "Vanderbilt University",
+        "Duke University",
+        "Columbia University",
+        "Emory University"
+    ],
+    "form_data": {
+        "first_name": "Jay",
+        "last_name": "Vee",
+        "email": "j@ve.com",
+        "dob": "1988-07-04",
+        "graduation_year": 2007,
+        "zip_code": "13658",
+        "interested_schools": [
+            "Vanderbilt University",
+            "Yale University",
+            "Duke University",
+            "Columbia University"
+        ]
+    }
+}
