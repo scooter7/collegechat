@@ -143,16 +143,16 @@ with st.form(key="user_details_form"):
     selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
-        for school in st.session_state['relevant_schools']:
-            selected = st.checkbox(school, key=f"school_{school}")
-            if selected:
+        for idx, school in enumerate(st.session_state['relevant_schools']):
+            if st.checkbox(school, key=f"school_{idx}"):
                 selected_schools.append(school)
         # Debugging: Check the state of checkboxes
-        st.write("Checkbox States:", {f"school_{school}": st.session_state.get(f"school_{school}", False) for school in st.session_state['relevant_schools']})
+        st.write("Checkbox States:", {f"school_{idx}": st.session_state.get(f"school_{idx}", False) for idx, school in enumerate(st.session_state['relevant_schools'])})
 
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
+        st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
         if not selected_schools:
             st.error("Please select at least one school to continue.")
         else:
@@ -176,5 +176,5 @@ with st.form(key="user_details_form"):
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
 
-        # Debugging: Check selected schools
-        st.write("Selected Schools:", selected_schools)
+        # Debugging: Check selected schools after submission
+        st.write("Selected Schools (after check):", selected_schools)
