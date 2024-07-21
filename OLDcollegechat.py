@@ -99,7 +99,9 @@ if submitted_query:
         try:
             gemini_response_text = interpret_query(submitted_query)
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
-            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
+            # Extract unique, valid school names
+            relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
+            relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
@@ -130,6 +132,24 @@ if submitted_query:
         st.write("Extracted Schools:", relevant_schools)
         st.session_state['relevant_schools'] = relevant_schools
 
+# Ensure session state is initialized for selected schools
+if 'selected_schools' not in st.session_state:
+    st.session_state['selected_schools'] = []
+
+# Display checkboxes for school selection outside the form
+if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+    st.write("Select the schools you are interested in:")
+    for idx, school in enumerate(st.session_state['relevant_schools']):
+        if school not in st.session_state:
+            st.session_state[school] = False
+        st.session_state[school] = st.checkbox(school, value=st.session_state[school])
+        if st.session_state[school]:
+            if school not in st.session_state['selected_schools']:
+                st.session_state['selected_schools'].append(school)
+        else:
+            if school in st.session_state['selected_schools']:
+                st.session_state['selected_schools'].remove(school)
+
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
@@ -140,26 +160,10 @@ with st.form(key="user_details_form"):
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
 
-    selected_schools = []
-    if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-        st.write("Select the schools you are interested in:")
-        for idx, school in enumerate(st.session_state['relevant_schools']):
-            if f"school_{idx}_selected" not in st.session_state:
-                st.session_state[f"school_{idx}_selected"] = False
-            selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state[f"school_{idx}_selected"])
-            st.session_state[f"school_{idx}_selected"] = selected
-            if selected:
-                selected_schools.append(school)
-        # Debugging: Check the state of checkboxes
-        st.write("Checkbox States:", {f"school_{idx}": st.session_state.get(f"school_{idx}_selected", False) for idx, school in enumerate(st.session_state['relevant_schools'])})
-
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        # Ensure all selected schools are captured
-        selected_schools = [school for idx, school in enumerate(st.session_state['relevant_schools']) if st.session_state.get(f"school_{idx}_selected", False)]
-        st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
-        if not selected_schools:
+        if not st.session_state['selected_schools']:
             st.error("Please select at least one school to continue.")
         else:
             form_data = {
@@ -169,7 +173,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": selected_schools
+                "interested_schools": st.session_state['selected_schools']
             }
 
             # Save conversation history to GitHub
@@ -183,4 +187,4 @@ with st.form(key="user_details_form"):
             st.success("Your information has been submitted successfully.")
 
         # Debugging: Check selected schools after submission
-        st.write("Selected Schools (after check):", selected_schools)
+        st.write("Selected Schools (after check):", st.session_state['selected_schools'])
