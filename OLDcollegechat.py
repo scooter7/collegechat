@@ -98,6 +98,7 @@ if submitted_query and 'relevant_schools' not in st.session_state:
 
         try:
             gemini_response_text = interpret_query(submitted_query)
+            st.session_state['gemini_response_text'] = gemini_response_text
             st.write(f"Bot Response: {gemini_response_text}")  # Display the bot response
             # Extract unique, valid school names
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
@@ -113,6 +114,10 @@ if submitted_query and 'relevant_schools' not in st.session_state:
 # Ensure session state is initialized for selected schools
 if 'selected_schools' not in st.session_state:
     st.session_state['selected_schools'] = []
+
+# Display the stored bot response if available
+if 'gemini_response_text' in st.session_state:
+    st.write(f"Bot Response: {st.session_state['gemini_response_text']}")
 
 # Display checkboxes for school selection outside the form
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
