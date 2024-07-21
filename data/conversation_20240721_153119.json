@@ -1,0 +1,43 @@
+{
+    "timestamp": "2024-07-21T15:31:19.583668",
+    "query": "best nursing schools",
+    "results": [
+        "Curtin University",
+        "Virginia Commonwealth University",
+        "Imperial College",
+        "Johns Hopkins University",
+        "Columbia University",
+        "Duke University",
+        "Boston College",
+        "University of Iowa College",
+        " Rory Meyers College",
+        "Frontier Nursing University",
+        "New York University",
+        "Hong Kong Polytechnic University",
+        "McGill University",
+        "Indiana University",
+        "Vanderbilt University",
+        "s College",
+        "Stanford University",
+        "National University",
+        "Queensland University",
+        "Case Western Reserve University",
+        "Emory University",
+        "Rush University"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@e.net",
+        "dob": "2024-07-21",
+        "graduation_year": 1900,
+        "zip_code": "52403",
+        "interested_schools": [
+            "New York University",
+            "Duke University",
+            "Johns Hopkins University",
+            "Indiana University",
+            "Rush University"
+        ]
+    }
+}
