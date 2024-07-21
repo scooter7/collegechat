@@ -102,6 +102,11 @@ if submitted_query:
             # Extract unique, valid school names
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
             relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
+            # Initialize relevant_schools in session state if not already present
+            if 'relevant_schools' not in st.session_state:
+                st.session_state['relevant_schools'] = relevant_schools
+            else:
+                st.session_state['relevant_schools'] = list(set(st.session_state['relevant_schools'] + relevant_schools))
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
@@ -129,8 +134,7 @@ if submitted_query:
                 st.write(f"No results found for: {keyword}")
 
         # Debugging: Check the extracted school names
-        st.write("Extracted Schools:", relevant_schools)
-        st.session_state['relevant_schools'] = relevant_schools
+        st.write("Extracted Schools:", st.session_state['relevant_schools'])
 
 # Ensure session state is initialized for selected schools
 if 'selected_schools' not in st.session_state:
@@ -139,7 +143,7 @@ if 'selected_schools' not in st.session_state:
 # Display checkboxes for school selection outside the form
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     st.write("Select the schools you are interested in:")
-    for idx, school in enumerate(st.session_state['relevant_schools']):
+    for school in st.session_state['relevant_schools']:
         if school not in st.session_state:
             st.session_state[school] = False
         st.session_state[school] = st.checkbox(school, value=st.session_state[school])
