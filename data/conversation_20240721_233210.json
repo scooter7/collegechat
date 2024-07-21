@@ -1,0 +1,22 @@
+{
+    "timestamp": "2024-07-21T23:32:10.998781",
+    "query": "graduate business programs in New York",
+    "results": [
+        "City University",
+        "Pace University",
+        "Baruch College"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "v",
+        "email": "t@a.org",
+        "dob": "1999-07-21",
+        "graduation_year": 2004,
+        "zip_code": "52403",
+        "interested_schools": [
+            "Cornell University",
+            "New York University",
+            "Baruch College"
+        ]
+    }
+}
