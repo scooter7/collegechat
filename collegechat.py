@@ -78,6 +78,17 @@ def save_conversation_history_to_github(history):
     except Exception as e:
         st.error(f"Failed to save file to GitHub: {e}")
 
+# Initialize session state for form data if not already set
+if 'form_data' not in st.session_state:
+    st.session_state['form_data'] = {
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "dob": "",
+        "graduation_year": 1900,
+        "zip_code": ""
+    }
+
 # Streamlit app UI
 st.title('College Information Assistant')
 
@@ -89,7 +100,7 @@ if st.button("Ask"):
         st.session_state['submitted_query'] = query
         submitted_query = query
 
-if submitted_query and 'relevant_schools' not in st.session_state:
+if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
     else:
@@ -104,7 +115,10 @@ if submitted_query and 'relevant_schools' not in st.session_state:
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
             relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
             # Initialize relevant_schools in session state
-            st.session_state['relevant_schools'] = relevant_schools
+            if 'relevant_schools' not in st.session_state:
+                st.session_state['relevant_schools'] = []
+            st.session_state['relevant_schools'].extend(relevant_schools)
+            st.session_state['relevant_schools'] = list(set(st.session_state['relevant_schools']))
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
@@ -136,12 +150,12 @@ if 'relevant_schools' in st.session_state and st.session_state['relevant_schools
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
-    first_name = st.text_input("First Name")
-    last_name = st.text_input("Last Name")
-    email = st.text_input("Email Address")
-    dob = st.date_input("Date of Birth")
-    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
-    zip_code = st.text_input("5-digit Zip Code")
+    first_name = st.text_input("First Name", value=st.session_state['form_data']['first_name'])
+    last_name = st.text_input("Last Name", value=st.session_state['form_data']['last_name'])
+    email = st.text_input("Email Address", value=st.session_state['form_data']['email'])
+    dob = st.date_input("Date of Birth", value=datetime.strptime(st.session_state['form_data']['dob'], "%Y-%m-%d") if st.session_state['form_data']['dob'] else datetime.now())
+    graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1, value=st.session_state['form_data']['graduation_year'])
+    zip_code = st.text_input("5-digit Zip Code", value=st.session_state['form_data']['zip_code'])
 
     submit_button = st.form_submit_button("Submit")
 
@@ -158,6 +172,9 @@ with st.form(key="user_details_form"):
                 "zip_code": zip_code,
                 "interested_schools": st.session_state['selected_schools']
             }
+
+            # Update session state form data
+            st.session_state['form_data'] = form_data
 
             # Save conversation history to GitHub
             history = {
