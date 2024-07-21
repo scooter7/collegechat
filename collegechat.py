@@ -152,6 +152,7 @@ with st.form(key="user_details_form"):
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
+        st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
         if not selected_schools:
             st.error("Please select at least one school to continue.")
         else:
@@ -175,5 +176,5 @@ with st.form(key="user_details_form"):
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
 
-        # Debugging: Check selected schools
-        st.write("Selected Schools:", selected_schools)
+        # Debugging: Check selected schools after submission
+        st.write("Selected Schools (after check):", selected_schools)
