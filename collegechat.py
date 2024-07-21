@@ -118,6 +118,9 @@ if submitted_query:
         if gemini_response_text:
             relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
         
+        # Debugging: Check the extracted school names
+        st.write("Extracted Schools:", relevant_schools)
+
         st.session_state['relevant_schools'] = relevant_schools
 
         if results:
@@ -137,10 +140,11 @@ with st.form(key="user_details_form"):
     zip_code = st.text_input("5-digit Zip Code")
 
     selected_schools = []
-    if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+    if 'relevant_schools' in st.session_state:
         st.write("Select the schools you are interested in:")
         for school in st.session_state['relevant_schools']:
-            if st.checkbox(school, key=f"school_{school}"):
+            selected = st.checkbox(school, key=f"school_{school}")
+            if selected:
                 selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
@@ -168,3 +172,6 @@ with st.form(key="user_details_form"):
             }
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
+
+        # Debugging: Check selected schools
+        st.write("Selected Schools:", selected_schools)
