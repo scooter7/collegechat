@@ -33,7 +33,7 @@ def interpret_query(query):
     chat = model.start_chat(history=[])
     chunks = [query[i:i+1000] for i in range(0, len(query), 1000)]
     responses = []
-    for chunk in chunks, chat):
+    for chunk in chunks:
         response = chat.send_message(chunk)
         responses.append(response.text)
     return ' '.join(responses)
