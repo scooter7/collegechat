@@ -140,7 +140,6 @@ with st.form(key="user_details_form"):
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
 
-    selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for idx, school in enumerate(st.session_state['relevant_schools']):
