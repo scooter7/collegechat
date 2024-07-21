@@ -139,7 +139,10 @@ with st.form(key="user_details_form"):
     selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
-        selected_schools = st.multiselect("Schools", st.session_state['relevant_schools'])
+        for school in st.session_state['relevant_schools']:
+            selected = st.checkbox(school, key=school)
+            if selected:
+                selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
 
