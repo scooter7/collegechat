@@ -132,6 +132,15 @@ if submitted_query:
         st.write("Extracted Schools:", relevant_schools)
         st.session_state['relevant_schools'] = relevant_schools
 
+if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
+    st.write("Select the schools you are interested in:")
+    selected_schools = []
+    for idx, school in enumerate(st.session_state['relevant_schools']):
+        selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state.get(f"school_{idx}_selected", False))
+        st.session_state[f"school_{idx}_selected"] = selected
+        if selected:
+            selected_schools.append(school)
+
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
     st.write("Please fill out the form below to learn more about the colleges.")
@@ -142,18 +151,11 @@ with st.form(key="user_details_form"):
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
 
-    if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-        st.write("Select the schools you are interested in:")
-        selected_schools = []
-        for idx, school in enumerate(st.session_state['relevant_schools']):
-            selected = st.checkbox(school, key=f"school_{idx}")
-            if selected:
-                selected_schools.append(school)
-
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
         # Ensure all selected schools are captured
+        selected_schools = [school for idx, school in enumerate(st.session_state['relevant_schools']) if st.session_state.get(f"school_{idx}_selected", False)]
         st.write("Selected Schools (before check):", selected_schools)  # Debugging: Check selected schools before validation
         if not selected_schools:
             st.error("Please select at least one school to continue.")
