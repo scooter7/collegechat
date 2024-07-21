@@ -136,13 +136,14 @@ with st.form(key="user_details_form"):
     graduation_year = st.number_input("High School Graduation Year", min_value=1900, max_value=datetime.now().year, step=1)
     zip_code = st.text_input("5-digit Zip Code")
 
-    selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
+        selected_schools = []
         for i, school in enumerate(st.session_state['relevant_schools']):
-            selected = st.checkbox(school, key=f"{school}_{i}")
-            if selected:
+            if st.checkbox(school, key=f"{school}_{i}"):
                 selected_schools.append(school)
+    else:
+        selected_schools = []
 
     submit_button = st.form_submit_button("Submit")
 
