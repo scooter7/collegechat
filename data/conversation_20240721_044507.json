@@ -1,0 +1,35 @@
+{
+    "timestamp": "2024-07-21T04:45:07.297287",
+    "query": "graduate business programs in New York",
+    "results": [
+        "Columbia University",
+        "New York University",
+        "New York University",
+        "Cornell University",
+        "Cornell University",
+        "Fordham University",
+        "Fordham University",
+        "Baruch College",
+        "Baruch College",
+        "City University",
+        "Pace University",
+        "Pace University",
+        "Rochester Institute of Technology Saunders College",
+        "Stony Brook University",
+        "Stony Brook University",
+        "Syracuse University",
+        "Syracuse University",
+        "State University"
+    ],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "t@est.org",
+        "dob": "1987-07-21",
+        "graduation_year": 2004,
+        "zip_code": "11111",
+        "interested_schools": [
+            "Pace University"
+        ]
+    }
+}
