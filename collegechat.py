@@ -100,6 +100,10 @@ if st.button("Ask"):
         st.session_state['submitted_query'] = query
         submitted_query = query
 
+        # Reset relevant session state variables
+        st.session_state['gemini_response_text'] = ""
+        st.session_state['relevant_schools'] = []
+
 if submitted_query:
     if not is_query_allowed(submitted_query):
         st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
@@ -115,10 +119,7 @@ if submitted_query:
             relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
             relevant_schools = [school for school in relevant_schools if school.strip() and school != " College"]
             # Initialize relevant_schools in session state
-            if 'relevant_schools' not in st.session_state:
-                st.session_state['relevant_schools'] = []
-            st.session_state['relevant_schools'].extend(relevant_schools)
-            st.session_state['relevant_schools'] = list(set(st.session_state['relevant_schools']))
+            st.session_state['relevant_schools'] = relevant_schools
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
