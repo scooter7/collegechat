@@ -147,8 +147,11 @@ with st.form(key="user_details_form"):
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for school in st.session_state['relevant_schools']:
-            if st.checkbox(school, key=f"school_{school}"):
+            selected = st.checkbox(school, key=f"school_{school}")
+            if selected:
                 selected_schools.append(school)
+        # Debugging: Check the state of checkboxes
+        st.write("Checkbox States:", {f"school_{school}": st.session_state.get(f"school_{school}", False) for school in st.session_state['relevant_schools']})
 
     submit_button = st.form_submit_button("Submit")
 
