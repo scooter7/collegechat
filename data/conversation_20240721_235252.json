@@ -1,0 +1,24 @@
+{
+    "timestamp": "2024-07-21T23:52:52.275851",
+    "query": "tell me more about University of Iowa",
+    "results": [
+        "Tippie College",
+        "A National Historic Landmark that serves as the University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "Conversations7!",
+        "first_name": "Jay",
+        "last_name": "Vee",
+        "email": "j@test.net",
+        "dob": "2000-07-21",
+        "graduation_year": 2011,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Stanford University",
+            "New York University",
+            "Columbia University",
+            "Tippie College"
+        ]
+    }
+}
