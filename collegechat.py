@@ -116,7 +116,7 @@ if submitted_query:
         # Extract school names from the Gemini response if available
         relevant_schools = []
         if gemini_response_text:
-            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
+            relevant_schools = re.findall(r'\b[A-Z][\w\s]*\b(?:University|College)\b', gemini_response_text)
         
         st.session_state['relevant_schools'] = relevant_schools
 
