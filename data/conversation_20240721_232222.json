@@ -1,0 +1,38 @@
+{
+    "timestamp": "2024-07-21T23:22:22.694041",
+    "query": "graduate business programs in New York",
+    "results": [
+        "Hofstra University",
+        "Baruch College",
+        "City University",
+        "Columbia University",
+        "Babson College",
+        "Dartmouth College",
+        "Long Island University",
+        "Fordham University",
+        "Cornell University",
+        "Carnegie Mellon University",
+        "Pace University",
+        "s University",
+        "Yale University",
+        "New York University",
+        "Touro College",
+        "Tobin College",
+        "Capella University"
+    ],
+    "form_data": {
+        "first_name": "Jay",
+        "last_name": "Vee",
+        "email": "j@ve.com",
+        "dob": "2000-07-21",
+        "graduation_year": 2009,
+        "zip_code": "52403",
+        "interested_schools": [
+            "City University",
+            "Cornell University",
+            "Carnegie Mellon University",
+            "Capella University",
+            "Touro College"
+        ]
+    }
+}
