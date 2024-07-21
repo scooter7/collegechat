@@ -103,8 +103,11 @@ if submitted_query:
         except Exception as e:
             st.error(f"Error interacting with Gemini: {e}")
 
+        # Define state and keyword with default values
+        state = ""
+        keyword = "engineering"  # Default fallback keyword
+
         if not relevant_schools:
-            keyword = "engineering"  # Fallback keyword
             if "in" in submitted_query:
                 parts = re.split(r'\bin\b', submitted_query)
                 if len(parts) > 1:
@@ -112,9 +115,7 @@ if submitted_query:
                     state_match = re.search(r'\b(\w{2})\b', parts[1])
                     if state_match:
                         state = state_match.group(1).upper()
-            else:
-                state = ""
-            
+
             results = fetch_college_data(state, keyword)
             if results:
                 for college in results:
