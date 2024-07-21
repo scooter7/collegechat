@@ -136,13 +136,19 @@ if submitted_query:
 if 'selected_schools' not in st.session_state:
     st.session_state['selected_schools'] = []
 
+# Display checkboxes for school selection outside the form
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-    selected_schools = st.multiselect(
-        "Select the schools you are interested in:",
-        options=st.session_state['relevant_schools'],
-        default=st.session_state['selected_schools']
-    )
-    st.session_state['selected_schools'] = selected_schools
+    st.write("Select the schools you are interested in:")
+    for idx, school in enumerate(st.session_state['relevant_schools']):
+        if school not in st.session_state:
+            st.session_state[school] = False
+        st.session_state[school] = st.checkbox(school, value=st.session_state[school])
+        if st.session_state[school]:
+            if school not in st.session_state['selected_schools']:
+                st.session_state['selected_schools'].append(school)
+        else:
+            if school in st.session_state['selected_schools']:
+                st.session_state['selected_schools'].remove(school)
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
