@@ -116,18 +116,22 @@ if submitted_query:
         # Extract school names from the Gemini response if available
         relevant_schools = []
         if gemini_response_text:
-            relevant_schools = re.findall(r'\b[\w\s]+\bUniversity\b|\b[\w\s]+\bCollege\b', gemini_response_text)
+            relevant_schools = re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)
         
         # Debugging: Check the extracted school names
         st.write("Extracted Schools:", relevant_schools)
 
-        st.session_state['relevant_schools'] = relevant_schools
-
+        # Ensure results are handled correctly
         if results:
             for college in results:
-                st.write(f"Name: {college['school.name']}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
+                school_name = college['school.name']
+                if school_name not in relevant_schools:
+                    relevant_schools.append(school_name)
+                st.write(f"Name: {school_name}, City: {college['school.city']}, State: {college['school.state']}, Admission Rate: {college['latest.admissions.admission_rate.overall']}")
         else:
             st.write(f"No results found for: {keyword}")
+
+        st.session_state['relevant_schools'] = relevant_schools
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
@@ -140,11 +144,10 @@ with st.form(key="user_details_form"):
     zip_code = st.text_input("5-digit Zip Code")
 
     selected_schools = []
-    if 'relevant_schools' in st.session_state:
+    if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for school in st.session_state['relevant_schools']:
-            selected = st.checkbox(school, key=f"school_{school}")
-            if selected:
+            if st.checkbox(school, key=f"school_{school}"):
                 selected_schools.append(school)
 
     submit_button = st.form_submit_button("Submit")
