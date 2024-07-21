@@ -139,10 +139,11 @@ with st.form(key="user_details_form"):
     selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
+        selections = {}
         for idx, school in enumerate(st.session_state['relevant_schools']):
-            selected = st.checkbox(school, key=f"school_{idx}")
-            if selected:
-                selected_schools.append(school)
+            selections[school] = st.checkbox(school, key=f"school_{idx}")
+        
+        selected_schools = [school for school, selected in selections.items() if selected]
 
     submit_button = st.form_submit_button("Submit")
 
