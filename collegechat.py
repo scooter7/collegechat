@@ -132,21 +132,17 @@ if submitted_query:
         st.write("Extracted Schools:", relevant_schools)
         st.session_state['relevant_schools'] = relevant_schools
 
-# Ensure session state is initialized for each school
-if 'relevant_schools' in st.session_state:
-    for idx, school in enumerate(st.session_state['relevant_schools']):
-        if f"school_{idx}_selected" not in st.session_state:
-            st.session_state[f"school_{idx}_selected"] = False
+# Ensure session state is initialized for selected schools
+if 'selected_schools' not in st.session_state:
+    st.session_state['selected_schools'] = []
 
 if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
     selected_schools = st.multiselect(
         "Select the schools you are interested in:",
         options=st.session_state['relevant_schools'],
-        default=[school for school in st.session_state['relevant_schools'] if st.session_state.get(f"school_{idx}_selected", False)]
+        default=st.session_state['selected_schools']
     )
-
-    for school in st.session_state['relevant_schools']:
-        st.session_state[f"school_{idx}_selected"] = school in selected_schools
+    st.session_state['selected_schools'] = selected_schools
 
 # Always show form for user details and selected schools
 with st.form(key="user_details_form"):
@@ -161,9 +157,7 @@ with st.form(key="user_details_form"):
     submit_button = st.form_submit_button("Submit")
 
     if submit_button:
-        st.write("Form submitted")
-        st.write(f"Selected schools after submit: {selected_schools}")
-        if not selected_schools:
+        if not st.session_state['selected_schools']:
             st.error("Please select at least one school to continue.")
         else:
             form_data = {
@@ -173,7 +167,7 @@ with st.form(key="user_details_form"):
                 "dob": dob.strftime("%Y-%m-%d"),
                 "graduation_year": graduation_year,
                 "zip_code": zip_code,
-                "interested_schools": selected_schools
+                "interested_schools": st.session_state['selected_schools']
             }
 
             # Save conversation history to GitHub
@@ -185,3 +179,6 @@ with st.form(key="user_details_form"):
             }
             save_conversation_history_to_github(history)
             st.success("Your information has been submitted successfully.")
+
+        # Debugging: Check selected schools after submission
+        st.write("Selected Schools (after check):", st.session_state['selected_schools'])
