@@ -150,8 +150,6 @@ with st.form(key="user_details_form"):
             st.session_state[f"school_{idx}_selected"] = selected
             if selected:
                 selected_schools.append(school)
-        # Debugging: Check the state of checkboxes
-        st.write("Checkbox States:", {f"school_{idx}": st.session_state.get(f"school_{idx}_selected", False) for idx, school in enumerate(st.session_state['relevant_schools'])})
 
     submit_button = st.form_submit_button("Submit")
 
