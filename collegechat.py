@@ -146,10 +146,7 @@ with st.form(key="user_details_form"):
         st.write("Select the schools you are interested in:")
         selected_schools = []
         for idx, school in enumerate(st.session_state['relevant_schools']):
-            if f"school_{idx}_selected" not in st.session_state:
-                st.session_state[f"school_{idx}_selected"] = False
-            selected = st.checkbox(school, key=f"school_{idx}", value=st.session_state[f"school_{idx}_selected"])
-            st.session_state[f"school_{idx}_selected"] = selected
+            selected = st.checkbox(school, key=f"school_{idx}")
             if selected:
                 selected_schools.append(school)
 
