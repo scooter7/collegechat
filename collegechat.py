@@ -22,7 +22,7 @@ if not github_token:
 genai.configure(api_key=genai_api_key)
 
 # List of banned keywords
-banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
+banned_keywords are = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 
 def is_query_allowed(query):
     return not any(keyword in query.lower() for keyword in banned_keywords)
@@ -31,7 +31,7 @@ def is_query_allowed(query):
 def interpret_query(query):
     model = genai.GenerativeModel("gemini-pro")
     chat = model.start_chat(history=[])
-    chunks = [query[i:i+1000] for i in range(0, len(query), 1000)]
+    chunks = [query[i:i + 1000] for i in range(0, len(query), 1000)]
     responses = []
     for chunk in chunks:
         response = chat.send_message(chunk)
@@ -144,7 +144,8 @@ with st.form(key="user_details_form"):
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
         st.write("Select the schools you are interested in:")
         for idx, school in enumerate(st.session_state['relevant_schools']):
-            if st.checkbox(school, key=f"school_{idx}"):
+            selected = st.checkbox(school, key=f"school_{idx}")
+            if selected:
                 selected_schools.append(school)
         # Debugging: Check the state of checkboxes
         st.write("Checkbox States:", {f"school_{idx}": st.session_state.get(f"school_{idx}", False) for idx, school in enumerate(st.session_state['relevant_schools'])})
