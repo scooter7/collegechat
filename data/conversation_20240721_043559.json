@@ -1,0 +1,28 @@
+{
+    "timestamp": "2024-07-21T04:35:59.035801",
+    "query": "graduate engineering programs in Florida",
+    "results": [
+        "Florida Agricultural and Mechanical University",
+        "Florida Atlantic University",
+        "Florida Gulf Coast University",
+        "Florida International University",
+        "Florida State University",
+        "Riddle Aeronautical University",
+        "Florida Polytechnic University",
+        "Jacksonville University",
+        "Palm Beach Atlantic University",
+        "Rollins College",
+        "Stetson University"
+    ],
+    "form_data": {
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "dob": "2024-07-21",
+        "graduation_year": 1900,
+        "zip_code": "",
+        "interested_schools": [
+            "Florida State University"
+        ]
+    }
+}
