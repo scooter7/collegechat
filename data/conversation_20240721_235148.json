@@ -1,0 +1,37 @@
+{
+    "timestamp": "2024-07-21T23:51:48.427005",
+    "query": "best undergraduate programs for writing",
+    "results": [
+        "Brown University",
+        "Residential College",
+        "Carnegie Mellon University",
+        "New York University",
+        "Sarah Lawrence College",
+        "Yale University",
+        "Columbia University",
+        "Princeton University",
+        "Amherst College",
+        "Cornell University",
+        "Emerson College",
+        "Boston University",
+        "Harvard University",
+        "Dartmouth College",
+        "Johns Hopkins University",
+        "George Mason University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "Conversations7!",
+        "first_name": "Jay",
+        "last_name": "Vee",
+        "email": "j@test.net",
+        "dob": "2000-07-21",
+        "graduation_year": 2011,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Stanford University",
+            "New York University",
+            "Columbia University"
+        ]
+    }
+}
