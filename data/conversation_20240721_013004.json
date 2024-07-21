@@ -1,0 +1,17 @@
+{
+    "timestamp": "2024-07-21T01:30:04.109948",
+    "query": "graduate business programs in New York",
+    "results": [],
+    "form_data": {
+        "first_name": "J",
+        "last_name": "V",
+        "email": "t@est.org",
+        "dob": "1989-07-21",
+        "graduation_year": 2000,
+        "zip_code": "11111",
+        "interested_schools": [
+            "Columbia University",
+            "Cornell University"
+        ]
+    }
+}
