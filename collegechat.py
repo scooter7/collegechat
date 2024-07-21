@@ -33,7 +33,7 @@ def interpret_query(query):
     chat = model.start_chat(history=[])
     chunks = [query[i:i+1000] for i in range(0, len(query), 1000)]
     responses = []
-    for chunk in chunks:
+    for chunk in chunks, chat):
         response = chat.send_message(chunk)
         responses.append(response.text)
     return ' '.join(responses)
@@ -138,11 +138,10 @@ with st.form(key="user_details_form"):
 
     selected_schools = []
     if 'relevant_schools' in st.session_state and st.session_state['relevant_schools']:
-        st.write("Select the schools you are interested in:")
-        for idx, school in enumerate(st.session_state['relevant_schools']):
-            selected = st.checkbox(school, key=f"school_{idx}")
-            if selected:
-                selected_schools.append(school)
+        selected_schools = st.multiselect(
+            "Select the schools you are interested in:",
+            st.session_state['relevant_schools']
+        )
 
     submit_button = st.form_submit_button("Submit")
 
