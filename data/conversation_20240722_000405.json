@@ -1,0 +1,30 @@
+{
+    "timestamp": "2024-07-22T00:04:05.554713",
+    "query": "top nursing programs in Texas",
+    "results": [
+        "M University",
+        "Texas Tech University",
+        "Baylor University",
+        "Houston Baptist University",
+        "Sam Houston State University",
+        "s University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "Conversations7!",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@test.net",
+        "dob": "1986-07-22",
+        "graduation_year": 2010,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Concordia University",
+            "Dominican University",
+            "Stanford University",
+            "California State University",
+            "Texas Tech University",
+            "Sam Houston State University"
+        ]
+    }
+}
