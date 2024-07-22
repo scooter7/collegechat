@@ -39,7 +39,6 @@ def interpret_query(query):
         if hasattr(response, 'text'):
             responses.append(response.text)
         else:
-            st.error(f"Error interacting with Gemini: {getattr(response, 'finish_reason', 'Unknown error')}")
             break
     return ' '.join(responses)
 
@@ -77,7 +76,7 @@ def save_conversation_history_to_github(history):
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
     except Exception as e:
-        st.error(f"Failed to save file to GitHub: {e}")
+        st.error(f"Failed to save file to GitHub.")
 
 # Function to load user profile from JSON file
 def load_user_profile(username):
@@ -176,7 +175,7 @@ def main_app():
                 if 'relevant_schools' not in st.session_state or not st.session_state['relevant_schools']:
                     st.session_state['relevant_schools'] = relevant_schools
             except Exception as e:
-                st.error(f"Error interacting with Gemini: {e}")
+                st.error(f"Error interacting with Gemini.")
 
             # Debugging: Check the extracted school names
             st.write("Extracted Schools:", st.session_state['relevant_schools'])
@@ -207,17 +206,9 @@ def main_app():
     st.session_state['profile']['selected_schools'] = st.session_state['selected_schools']
     save_user_profile(st.session_state['username'], st.session_state['profile'])
 
-    # Always show form for user details and selected schools
-    with st.form(key="user_details_form"):
-        st.write("Your Profile Information:")
-        st.write(f"First Name: {st.session_state['profile']['first_name']}")
-        st.write(f"Last Name: {st.session_state['profile']['last_name']}")
-        st.write(f"Email: {st.session_state['profile']['email']}")
-        st.write(f"Date of Birth: {st.session_state['profile']['dob']}")
-        st.write(f"Graduation Year: {st.session_state['profile']['graduation_year']}")
-        st.write(f"Zip Code: {st.session_state['profile']['zip_code']}")
-
-        submit_button = st.form_submit_button("Submit")
+    # Form to save selected schools
+    with st.form(key="school_selection_form"):
+        submit_button = st.form_submit_button("Save Selection")
 
         if submit_button:
             if not st.session_state['selected_schools']:
@@ -231,7 +222,7 @@ def main_app():
                     "form_data": st.session_state['profile']
                 }
                 save_conversation_history_to_github(history)
-                st.success("Your information has been submitted successfully")
+                st.success("Your selection has been saved successfully")
 
             # Debugging: Check selected schools after submission
             st.write("Selected Schools (after check):", st.session_state['selected_schools'])
