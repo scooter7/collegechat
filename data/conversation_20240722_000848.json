@@ -1,0 +1,35 @@
+{
+    "timestamp": "2024-07-22T00:08:48.233022",
+    "query": "private colleges in Oregon",
+    "results": [
+        "Clark College",
+        "Reed College",
+        "Pacific Northwest College",
+        "Willamette University",
+        "Portland State University",
+        "Linfield College",
+        "Western Oregon University",
+        "Science University",
+        "George Fox University"
+    ],
+    "form_data": {
+        "username": "scootervineburgh",
+        "password": "Conversations7!",
+        "first_name": "James",
+        "last_name": "V",
+        "email": "T2esting.org",
+        "dob": "1986-11-22",
+        "graduation_year": 2009,
+        "zip_code": "11111",
+        "selected_schools": [
+            "Concordia University",
+            "Dominican University",
+            "Stanford University",
+            "California State University",
+            "Texas Tech University",
+            "Sam Houston State University",
+            "Clark College",
+            "Pacific Northwest College"
+        ]
+    }
+}
