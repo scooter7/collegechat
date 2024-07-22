@@ -1,0 +1,35 @@
+{
+    "timestamp": "2024-07-22T14:46:46.197043",
+    "query": "online mba programs in CT",
+    "results": [
+        "Western Connecticut State University",
+        "Quinnipiac University",
+        "Post University",
+        "Charter Oak State College",
+        "Sacred Heart University",
+        "Berkeley College"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "Conversations7!",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@test.net",
+        "dob": "1986-07-22",
+        "graduation_year": 2010,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Concordia University",
+            "Dominican University",
+            "Stanford University",
+            "Texas Tech University",
+            "Sam Houston State University",
+            "Samuel Merritt University",
+            "New York University",
+            "Southern New Hampshire University",
+            "Stony Brook University",
+            "Western Connecticut State University",
+            "Quinnipiac University"
+        ]
+    }
+}
