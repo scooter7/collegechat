@@ -1,0 +1,31 @@
+{
+    "timestamp": "2024-08-01T17:43:08.439981",
+    "query": "graduate dental schools in New England",
+    "results": [
+        "Boston University",
+        "University of Rhode Island College",
+        "Tufts University",
+        "University of Vermont College",
+        "University of New Hampshire College",
+        "Western New England University",
+        "University of Maine College"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "$2b$12$JEuFSB8QjGg9.NRQL4Nr.OdIrCwcACwRstueQSmQIdC0/eC6BQCe.",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "scooter.vineburgh@gmail.com",
+        "dob": "1974-06-07",
+        "graduation_year": 1991,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Dartmouth College",
+            "Norwich University",
+            "Champlain College",
+            "Middlebury College",
+            "Boston University",
+            "Tufts University"
+        ]
+    }
+}
