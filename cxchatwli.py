@@ -153,7 +153,8 @@ def main_app():
     if st.button("Logout"):
         del st.session_state['username']
         del st.session_state['profile']
-        st.experimental_rerun()
+        st.experimental_set_query_params()
+        st.stop()
 
     query = st.text_input("Ask about colleges:")
     submitted_query = st.session_state.get('submitted_query', '')
