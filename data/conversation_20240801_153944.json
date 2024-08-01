@@ -1,0 +1,23 @@
+{
+    "timestamp": "2024-08-01T15:39:44.007381",
+    "query": "best colleges in NH",
+    "results": [
+        "Saint Anselm College",
+        "Keene State College",
+        "Rivier University",
+        "Dartmouth College"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "$2b$12$JEuFSB8QjGg9.NRQL4Nr.OdIrCwcACwRstueQSmQIdC0/eC6BQCe.",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "scooter.vineburgh@gmail.com",
+        "dob": "1974-06-07",
+        "graduation_year": 1991,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Dartmouth College"
+        ]
+    }
+}
