@@ -1,0 +1,23 @@
+{
+    "timestamp": "2024-08-01T13:46:35.837981",
+    "query": "what are good business programs in CT?",
+    "results": [
+        "Sacred Heart University",
+        "Quinnipiac University",
+        "Central Connecticut State University",
+        "Yale University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "Conversations7!",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "scooter.vineburgh@gmail.com",
+        "dob": "2024-08-01",
+        "graduation_year": 1900,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Yale University"
+        ]
+    }
+}
