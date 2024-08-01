@@ -1,0 +1,26 @@
+{
+    "timestamp": "2024-08-01T15:41:18.856676",
+    "query": "what are good schools in Vermont with engineering degrees?",
+    "results": [
+        "Vermont Technical College",
+        "Norwich University",
+        "Champlain College",
+        "Middlebury College"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "$2b$12$JEuFSB8QjGg9.NRQL4Nr.OdIrCwcACwRstueQSmQIdC0/eC6BQCe.",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "scooter.vineburgh@gmail.com",
+        "dob": "1974-06-07",
+        "graduation_year": 1991,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Dartmouth College",
+            "Norwich University",
+            "Champlain College",
+            "Middlebury College"
+        ]
+    }
+}
