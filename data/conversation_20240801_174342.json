@@ -1,0 +1,28 @@
+{
+    "timestamp": "2024-08-01T17:43:42.397772",
+    "query": "what about law schools in Delaware",
+    "results": [
+        "Widener University",
+        "The University",
+        "Delaware Law School of Wilmington University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "$2b$12$JEuFSB8QjGg9.NRQL4Nr.OdIrCwcACwRstueQSmQIdC0/eC6BQCe.",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "scooter.vineburgh@gmail.com",
+        "dob": "1974-06-07",
+        "graduation_year": 1991,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Dartmouth College",
+            "Norwich University",
+            "Champlain College",
+            "Middlebury College",
+            "Boston University",
+            "Tufts University",
+            "Delaware Law School of Wilmington University"
+        ]
+    }
+}
