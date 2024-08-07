@@ -89,8 +89,6 @@ def load_user_profile(username):
 
 # Function to save user profile to JSON file
 def save_user_profile(username, profile):
-    # Ensure the directory exists
-    os.makedirs("user_profiles", exist_ok=True)
     with open(f"user_profiles/{username}.json", "w") as f:
         json.dump(profile, f, indent=4)
 
