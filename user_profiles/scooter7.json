@@ -7,5 +7,9 @@
     "dob": "2000-08-07",
     "graduation_year": 1900,
     "zip_code": "55555",
-    "selected_schools": []
+    "selected_schools": [
+        "Northwest Nazarene University",
+        "Boise State University",
+        "Brigham Young University"
+    ]
 }
