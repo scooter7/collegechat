@@ -6,6 +6,7 @@ import json
 from github import Github
 import re
 import os
+import bcrypt
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -92,6 +93,14 @@ def save_user_profile(username, profile):
     with open(f"user_profiles/{username}.json", "w") as f:
         json.dump(profile, f, indent=4)
 
+# Function to hash a password
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+# Function to verify a password
+def verify_password(password, hashed):
+    return bcrypt.checkpw(password.encode(), hashed.encode())
+
 # Login or Register Screen
 def login_screen():
     st.title("Login or Sign Up")
@@ -102,7 +111,7 @@ def login_screen():
     if option == "Login":
         if st.button("Login"):
             user_profile = load_user_profile(username)
-            if user_profile and user_profile.get("password") == password:
+            if user_profile and verify_password(password, user_profile.get("password")):
                 st.session_state['username'] = username
                 st.session_state['profile'] = user_profile
                 st.success("Logged in successfully")
@@ -120,9 +129,10 @@ def login_screen():
             if load_user_profile(username):
                 st.error("Username already exists")
             else:
+                hashed_password = hash_password(password)
                 user_profile = {
                     "username": username,
-                    "password": password,
+                    "password": hashed_password,
                     "first_name": first_name,
                     "last_name": last_name,
                     "email": email,
@@ -143,7 +153,8 @@ def main_app():
     if st.button("Logout"):
         del st.session_state['username']
         del st.session_state['profile']
-        st.experimental_rerun()
+        st.experimental_set_query_params()
+        st.stop()
 
     query = st.text_input("Ask about colleges:")
     submitted_query = st.session_state.get('submitted_query', '')
