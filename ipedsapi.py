@@ -6,6 +6,7 @@ import pandas as pd
 import json
 from github import Github
 import re
+from rapidfuzz import process
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -54,15 +55,20 @@ def fetch_ipeds_data(years):
         st.error(f"Error fetching IPEDS data: {e}")
         return pd.DataFrame()
 
-# Function to filter IPEDS data based on relevant school names
+# Function to filter IPEDS data based on relevant school names using fuzzy matching
 def filter_ipeds_data(ipeds_data, relevant_schools):
     if ipeds_data.empty or not relevant_schools:
         st.write("No relevant schools found or IPEDS data is empty.")
         return pd.DataFrame()
     
     if 'instnm' in ipeds_data.columns:
-        pattern = '|'.join(re.escape(school) for school in relevant_schools)
-        filtered_data = ipeds_data[ipeds_data['instnm'].str.contains(pattern, case=False, na=False)]
+        matched_schools = []
+        for school in relevant_schools:
+            match = process.extractOne(school, ipeds_data['instnm'], score_cutoff=80)
+            if match:
+                matched_schools.append(match[0])
+        
+        filtered_data = ipeds_data[ipeds_data['instnm'].isin(matched_schools)]
         return filtered_data
     else:
         st.error("The column 'instnm' does not exist in the IPEDS data.")
@@ -119,7 +125,7 @@ if st.button("Ask"):
                 # Display column names for debugging purposes
                 st.write("IPEDS Data Columns:", ipeds_data.columns)
 
-                # Filter the IPEDS data based on the relevant school names
+                # Filter the IPEDS data based on the relevant school names using fuzzy matching
                 filtered_ipeds_data = filter_ipeds_data(ipeds_data, relevant_schools)
                 st.write("Filtered IPEDS Data:", filtered_ipeds_data)
 
