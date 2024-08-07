@@ -1,23 +1,22 @@
 import streamlit as st
 from datetime import datetime
-import requests
-import openai
+import google.generativeai as genai
 import pypeds
 import json
 from github import Github
 import re
 
 # Initialize API Keys
-openai_api_key = st.secrets.get("openai", {}).get("api_key", None)
+genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
 github_token = st.secrets.get("github", {}).get("token", None)
 
-if not openai_api_key:
-    st.error("OpenAI API key is missing.")
+if not genai_api_key:
+    st.error("Google Gemini API key is missing.")
 if not github_token:
     st.error("GitHub token is missing.")
 
-# Initialize OpenAI with API Key
-openai.api_key = openai_api_key
+# Initialize Google Gemini with API Key
+genai.configure(api_key=genai_api_key)
 
 # List of banned keywords
 banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
@@ -25,14 +24,20 @@ banned_keywords = ['politics', 'violence', 'gambling', 'drugs', 'alcohol']
 def is_query_allowed(query):
     return not any(keyword in query.lower() for keyword in banned_keywords)
 
-# Function to interpret the query using OpenAI
+# Function to interpret the query using Google Gemini with chunking
 def interpret_query(query):
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=f"User asked: {query}\nAnswer using IPEDS data:",
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+    model = genai.GenerativeModel("gemini-pro")
+    chat = model.start_chat(history=[])
+    chunks = [query[i:i+1000] for i in range(0, len(query), 1000)]
+    responses = []
+    for chunk in chunks:
+        response = chat.send_message(chunk)
+        if hasattr(response, 'text'):
+            responses.append(response.text)
+        else:
+            st.error(f"Error interacting with Gemini: {getattr(response, 'finish_reason', 'Unknown error')}")
+            break
+    return ' '.join(responses)
 
 # Function to fetch data from IPEDS using pypeds
 def fetch_ipeds_data(query):
@@ -77,7 +82,7 @@ if st.button("Ask"):
             st.error("Your query contains topics that I'm not able to discuss. Please ask about colleges and universities.")
         else:
             try:
-                # Interpret the query using OpenAI
+                # Interpret the query using Google Gemini
                 gemini_response_text = interpret_query(query)
                 st.write(f"Bot Response: {gemini_response_text}")
 
