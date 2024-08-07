@@ -57,7 +57,9 @@ def fetch_ipeds_data(years):
 # Function to filter IPEDS data based on relevant school names
 def filter_ipeds_data(ipeds_data, relevant_schools):
     if ipeds_data.empty or not relevant_schools:
+        st.write("No relevant schools found or IPEDS data is empty.")
         return pd.DataFrame()
+    
     if 'instnm' in ipeds_data.columns:
         pattern = '|'.join(re.escape(school) for school in relevant_schools)
         filtered_data = ipeds_data[ipeds_data['instnm'].str.contains(pattern, case=False, na=False)]
