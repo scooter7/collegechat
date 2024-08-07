@@ -77,20 +77,36 @@ def save_conversation_history_to_github(history):
         # Create the file in the repo
         repo.create_file(f"{folder_path}/{file_name}", f"Add {file_name}", file_content)
     except Exception as e:
-        st.error(f"Failed to save file to GitHub.")
+        st.error(f"Failed to save file to GitHub: {e}")
 
-# Function to load user profile from JSON file
+# Function to load user profile from GitHub
 def load_user_profile(username):
+    repo_name = "scooter7/collegechat"
+    file_path = f"user_profiles/{username}.json"
     try:
-        with open(f"user_profiles/{username}.json", "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
+        g = Github(github_token)
+        repo = g.get_repo(repo_name)
+        file_content = repo.get_contents(file_path)
+        return json.loads(file_content.decoded_content.decode())
+    except Exception as e:
         return None
 
-# Function to save user profile to JSON file
+# Function to save user profile to GitHub
 def save_user_profile(username, profile):
-    with open(f"user_profiles/{username}.json", "w") as f:
-        json.dump(profile, f, indent=4)
+    file_content = json.dumps(profile, indent=4)
+    repo_name = "scooter7/collegechat"
+    file_path = f"user_profiles/{username}.json"
+    
+    try:
+        g = Github(github_token)
+        repo = g.get_repo(repo_name)
+        try:
+            file = repo.get_contents(file_path)
+            repo.update_file(file_path, f"Update profile for {username}", file_content, file.sha)
+        except:
+            repo.create_file(file_path, f"Create profile for {username}", file_content)
+    except Exception as e:
+        st.error(f"Failed to save profile to GitHub: {e}")
 
 # Function to hash a password
 def hash_password(password):
