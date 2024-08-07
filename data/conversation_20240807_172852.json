@@ -1,0 +1,28 @@
+{
+    "timestamp": "2024-08-07T17:28:52.374654",
+    "query": "what about pre-law in Iowa?",
+    "results": [
+        "Central College",
+        "Iowa State University",
+        "Grinnell College",
+        "Loras College",
+        "Drake University"
+    ],
+    "form_data": {
+        "username": "scooter7",
+        "password": "$2b$12$Wdgmk67bv4Ls79.Ug/EMTOx/1GxKdNqNaMa/HpNiE1R6cmlJt8gWu",
+        "first_name": "J",
+        "last_name": "V",
+        "email": "j@v.net",
+        "dob": "2000-08-07",
+        "graduation_year": 1900,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Northwest Nazarene University",
+            "Boise State University",
+            "Brigham Young University",
+            "Iowa State University",
+            "Drake University"
+        ]
+    }
+}
