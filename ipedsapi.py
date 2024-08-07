@@ -58,12 +58,12 @@ def fetch_ipeds_data(years):
 def filter_ipeds_data(ipeds_data, relevant_schools):
     if ipeds_data.empty or not relevant_schools:
         return pd.DataFrame()
-    if 'INSTNM' in ipeds_data.columns:
+    if 'instnm' in ipeds_data.columns:
         pattern = '|'.join(re.escape(school) for school in relevant_schools)
-        filtered_data = ipeds_data[ipeds_data['INSTNM'].str.contains(pattern, case=False, na=False)]
+        filtered_data = ipeds_data[ipeds_data['instnm'].str.contains(pattern, case=False, na=False)]
         return filtered_data
     else:
-        st.error("The column 'INSTNM' does not exist in the IPEDS data.")
+        st.error("The column 'instnm' does not exist in the IPEDS data.")
         return pd.DataFrame()
 
 # Function to save conversation history to GitHub
