@@ -1,0 +1,28 @@
+{
+    "timestamp": "2024-08-07T16:34:00.070918",
+    "query": "good business schools in Texas",
+    "results": [
+        "Southern Methodist University",
+        "Rice University",
+        "Northwestern University",
+        "Bauer College",
+        "M University",
+        "Mendoza College",
+        "Texas Christian University"
+    ],
+    "form_data": {
+        "username": "carnegie",
+        "password": "$2b$12$4wwBeMe3haBTJIfhTr9l6uF/zgvgAZlNVuUFKzgFmgejUkU7/LEei",
+        "first_name": "Car",
+        "last_name": "Negie",
+        "email": "car@negie.com",
+        "dob": "1994-08-07",
+        "graduation_year": 2001,
+        "zip_code": "55555",
+        "selected_schools": [
+            "Rice University",
+            "Northwestern University",
+            "Bauer College"
+        ]
+    }
+}
