@@ -57,8 +57,9 @@ def fetch_ipeds_data(years):
 
 # Function to extract school names from the bot response using a more comprehensive regex
 def extract_school_names(response):
-    school_pattern = r'\b[\w\s]+(?:University|College|Institute|Academy|School|Center|Centre|University of [\w\s]+|College of [\w\s]+)\b'
-    return list(set(re.findall(school_pattern, response)))
+    school_pattern = r'\b(?:[\w\s]+University|[\w\s]+College|[\w\s]+Institute|[\w\s]+Academy|[\w\s]+School|[\w\s]+Center|[\w\s]+Centre|University of [\w\s]+|College of [\w\s]+)\b'
+    matches = re.findall(school_pattern, response)
+    return list(set(matches))
 
 # Function to filter IPEDS data based on relevant school names using fuzzy matching
 def filter_ipeds_data(ipeds_data, relevant_schools):
