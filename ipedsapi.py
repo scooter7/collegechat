@@ -1,7 +1,8 @@
 import streamlit as st
 from datetime import datetime
 import google.generativeai as genai
-import pypeds
+from pypeds import ipeds
+import pandas as pd
 import json
 from github import Github
 import re
@@ -40,14 +41,18 @@ def interpret_query(query):
     return ' '.join(responses)
 
 # Function to fetch data from IPEDS using pypeds
-def fetch_ipeds_data(query):
+def fetch_ipeds_data(years):
     try:
-        # Example IPEDS query using pypeds (adjust based on pypeds capabilities)
-        data = pypeds.get_data(query)  # Replace with actual function and parameters
-        return data
+        # Instantiate the survey of interest
+        hd = ipeds.HD(years=years)
+        # Extract, or download the surveys
+        hd.extract()
+        # Load the surveys as a pandas dataframe
+        df = hd.load()
+        return df
     except Exception as e:
         st.error(f"Error fetching IPEDS data: {e}")
-        return []
+        return pd.DataFrame()
 
 # Function to save conversation history to GitHub
 def save_conversation_history_to_github(history):
@@ -75,6 +80,7 @@ def save_conversation_history_to_github(history):
 st.title('IPEDS Data Chatbot')
 
 query = st.text_input("Ask about colleges:")
+years = st.multiselect("Select years for IPEDS data:", options=list(range(2000, 2024)), default=[2022, 2023])
 
 if st.button("Ask"):
     if query:
@@ -87,7 +93,7 @@ if st.button("Ask"):
                 st.write(f"Bot Response: {gemini_response_text}")
 
                 # Fetch data from IPEDS using pypeds
-                ipeds_data = fetch_ipeds_data(query)
+                ipeds_data = fetch_ipeds_data(years)
                 st.write("IPEDS Data:", ipeds_data)
 
                 # Save conversation history to GitHub
@@ -95,7 +101,7 @@ if st.button("Ask"):
                     "timestamp": datetime.now().isoformat(),
                     "query": query,
                     "response": gemini_response_text,
-                    "ipeds_data": ipeds_data
+                    "ipeds_data": ipeds_data.to_dict(orient='records')  # Convert DataFrame to dict for JSON serialization
                 }
                 save_conversation_history_to_github(history)
             except Exception as e:
