@@ -42,8 +42,10 @@ def interpret_query(query):
     return ' '.join(responses)
 
 # Function to fetch data from IPEDS using pypeds
-def fetch_ipeds_data(years):
+def fetch_ipeds_data():
     try:
+        # Set the year to 2021
+        years = [2021]
         # Instantiate the survey of interest
         hd = ipeds.HD(years=years)
         # Extract, or download the surveys
@@ -70,7 +72,7 @@ def filter_ipeds_data(ipeds_data, relevant_schools):
     if 'instnm' in ipeds_data.columns:
         matched_schools = []
         for school in relevant_schools:
-            match = process.extractOne(school, ipeds_data['instnm'], scorer=fuzz.token_sort_ratio, score_cutoff=90)
+            match = process.extractOne(school, ipeds_data['instnm'], scorer=fuzz.token_sort_ratio, score_cutoff=80)
             if match:
                 matched_schools.append(match[0])
         
@@ -106,7 +108,6 @@ def save_conversation_history_to_github(history):
 st.title('IPEDS Data Chatbot')
 
 query = st.text_input("Ask about colleges:")
-years = st.multiselect("Select years for IPEDS data:", options=list(range(2000, 2024)), default=[2022, 2023])
 
 if st.button("Ask"):
     if query:
@@ -125,7 +126,7 @@ if st.button("Ask"):
                 st.write("Extracted Schools:", relevant_schools)
 
                 # Fetch data from IPEDS using pypeds
-                ipeds_data = fetch_ipeds_data(years)
+                ipeds_data = fetch_ipeds_data()
 
                 # Display column names for debugging purposes
                 st.write("IPEDS Data Columns:", ipeds_data.columns)
