@@ -6,7 +6,7 @@ import pandas as pd
 import json
 from github import Github
 import re
-from rapidfuzz import process
+from rapidfuzz import process, fuzz
 
 # Initialize API Keys
 genai_api_key = st.secrets.get("google_gen_ai", {}).get("api_key", None)
@@ -55,6 +55,11 @@ def fetch_ipeds_data(years):
         st.error(f"Error fetching IPEDS data: {e}")
         return pd.DataFrame()
 
+# Function to extract school names from the bot response using a more comprehensive regex
+def extract_school_names(response):
+    school_pattern = r'\b[\w\s]+(?:University|College|Institute|Academy|School|Center|Centre)\b'
+    return list(set(re.findall(school_pattern, response)))
+
 # Function to filter IPEDS data based on relevant school names using fuzzy matching
 def filter_ipeds_data(ipeds_data, relevant_schools):
     if ipeds_data.empty or not relevant_schools:
@@ -64,7 +69,7 @@ def filter_ipeds_data(ipeds_data, relevant_schools):
     if 'instnm' in ipeds_data.columns:
         matched_schools = []
         for school in relevant_schools:
-            match = process.extractOne(school, ipeds_data['instnm'], score_cutoff=80)
+            match = process.extractOne(school, ipeds_data['instnm'], scorer=fuzz.token_sort_ratio, score_cutoff=90)
             if match:
                 matched_schools.append(match[0])
         
@@ -113,8 +118,7 @@ if st.button("Ask"):
                 st.write(f"Bot Response: {gemini_response_text}")
 
                 # Extract school names from the bot response
-                relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
-                relevant_schools = [school.strip() for school in relevant_schools if school.strip()]
+                relevant_schools = extract_school_names(gemini_response_text)
 
                 # Display the extracted school names
                 st.write("Extracted Schools:", relevant_schools)
