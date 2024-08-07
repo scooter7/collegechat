@@ -132,7 +132,7 @@ def login_screen():
                 hashed_password = hash_password(password)
                 user_profile = {
                     "username": username,
-                    "password": hashed_password,
+                    "password": hashed_password,  # Store the hashed password
                     "first_name": first_name,
                     "last_name": last_name,
                     "email": email,
