@@ -54,6 +54,14 @@ def fetch_ipeds_data(years):
         st.error(f"Error fetching IPEDS data: {e}")
         return pd.DataFrame()
 
+# Function to filter IPEDS data based on relevant school names
+def filter_ipeds_data(ipeds_data, relevant_schools):
+    if ipeds_data.empty or not relevant_schools:
+        return pd.DataFrame()
+    pattern = '|'.join(relevant_schools)
+    filtered_data = ipeds_data[ipeds_data['INSTNM'].str.contains(pattern, case=False, na=False)]
+    return filtered_data
+
 # Function to save conversation history to GitHub
 def save_conversation_history_to_github(history):
     file_content = json.dumps(history, indent=4)
@@ -92,16 +100,27 @@ if st.button("Ask"):
                 gemini_response_text = interpret_query(query)
                 st.write(f"Bot Response: {gemini_response_text}")
 
+                # Extract school names from the bot response
+                relevant_schools = list(set(re.findall(r'\b[\w\s]+University\b|\b[\w\s]+College\b', gemini_response_text)))
+                relevant_schools = [school.strip() for school in relevant_schools if school.strip()]
+
+                # Display the extracted school names
+                st.write("Extracted Schools:", relevant_schools)
+
                 # Fetch data from IPEDS using pypeds
                 ipeds_data = fetch_ipeds_data(years)
-                st.write("IPEDS Data:", ipeds_data)
+
+                # Filter the IPEDS data based on the relevant school names
+                filtered_ipeds_data = filter_ipeds_data(ipeds_data, relevant_schools)
+                st.write("Filtered IPEDS Data:", filtered_ipeds_data)
 
                 # Save conversation history to GitHub
                 history = {
                     "timestamp": datetime.now().isoformat(),
                     "query": query,
                     "response": gemini_response_text,
-                    "ipeds_data": ipeds_data.to_dict(orient='records')  # Convert DataFrame to dict for JSON serialization
+                    "relevant_schools": relevant_schools,
+                    "filtered_ipeds_data": filtered_ipeds_data.to_dict(orient='records')  # Convert DataFrame to dict for JSON serialization
                 }
                 save_conversation_history_to_github(history)
             except Exception as e:
