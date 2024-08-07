@@ -72,7 +72,7 @@ def filter_ipeds_data(ipeds_data, relevant_schools):
     if 'instnm' in ipeds_data.columns:
         matched_schools = []
         for school in relevant_schools:
-            match = process.extractOne(school, ipeds_data['instnm'], scorer=fuzz.token_sort_ratio, score_cutoff=90)
+            match = process.extractOne(school, ipeds_data['instnm'], scorer=fuzz.token_sort_ratio, score_cutoff=80)
             if match:
                 matched_schools.append(match[0])
         
