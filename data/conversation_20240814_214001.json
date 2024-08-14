@@ -1,0 +1,31 @@
+{
+    "timestamp": "2024-08-14T21:40:01.765681",
+    "query": "selective schools with chemistry on the west coast",
+    "response": "**California**\n\n* **Arcadia High School** (Arcadia)\n* **Bakersfield High School** (Bakersfield)\n* **Beverly Hills High School** (Beverly Hills)\n* **Burbank High School** (Burbank)\n* **Cerritos High School** (Cerritos)\n* **Fountain Valley High School** (Fountain Valley)\n* **Irvine High School** (Irvine)\n* **Mission San Jose High School** (Fremont)\n* **Monta Vista High School** (Cupertino)\n* **Palo Alto High School** (Palo Alto)\n* **Poway High School** (Poway)\n* **Sage Creek High School** (Carlsbad)\n* **Santa Monica High School** (Santa Monica)\n* **Torrey Pines High School** (San Diego)\n\n**Oregon**\n\n* **Jesuit High School** (Portland)\n* **Lincoln High School** (Portland)\n* **Sunset High School** (Beaverton)\n\n**Washington**\n\n* **Bellevue High School** (Bellevue)\n* **Edmonds-Woodway High School** (Edmonds)\n* **Garfield High School** (Seattle)\n* **Lakeside School** (Seattle)\n* **Overlake School** (Redmond)\n* **St. George's School** (Spokane)",
+    "relevant_schools": [
+        "Bakersfield High School",
+        "Monta Vista High School",
+        "Cerritos High School",
+        "Overlake School",
+        "s School",
+        "Garfield High School",
+        "Burbank High School",
+        "Fountain Valley High School",
+        "Lakeside School",
+        "Beverly Hills High School",
+        "Irvine High School",
+        "Mission San Jose High School",
+        "Sunset High School",
+        "Torrey Pines High School",
+        "Woodway High School",
+        "Lincoln High School",
+        "Sage Creek High School",
+        "Bellevue High School",
+        "Arcadia High School",
+        "Poway High School",
+        "Palo Alto High School",
+        "Jesuit High School",
+        "Santa Monica High School"
+    ],
+    "filtered_ipeds_data": []
+}
