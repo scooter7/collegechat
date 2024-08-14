@@ -1,0 +1,9 @@
+{
+    "timestamp": "2024-08-14T20:31:50.910535",
+    "query": "what is the largest school in vermont",
+    "response": "Burlington High School",
+    "relevant_schools": [
+        "Burlington High School"
+    ],
+    "filtered_ipeds_data": []
+}
