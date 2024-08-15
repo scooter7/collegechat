@@ -1,0 +1,9 @@
+{
+    "timestamp": "2024-08-15T14:21:48.849125",
+    "query": "What is the largest school in Vermont",
+    "response": "Champlain Valley Union High School",
+    "relevant_schools": [
+        "Champlain Valley Union High School"
+    ],
+    "filtered_ipeds_data": []
+}
