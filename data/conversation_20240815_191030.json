@@ -1,0 +1,12 @@
+{
+    "timestamp": "2024-08-15T19:10:30.644653",
+    "query": "show me schools in ca",
+    "response": "**Public Schools**\n\n* **California Department of Education:** Provides a comprehensive directory of public schools in California: https://www.cde.ca.gov/schooldirectory/\n* **Local School Districts:** Each school district in California maintains a website with information about its schools. You can find the website of your local school district by searching online using the name of the district or city.\n\n**Private Schools**\n\n* **California Association of Independent Schools (CAIS):** Represents over 800 private schools in California. Search for schools by location, grade level, and other criteria: https://www.caisca.org/\n* **National Association of Independent Schools (NAIS):** Provides a directory of private schools nationwide, including those in California: https://www.nais.org/directory/#search-form\n* **Private School Review:** Offers reviews and ratings of private schools in California: https://www.privateschoolreview.com/\n* **Independent School Management:** Provides a directory of private schools in California, as well as school profiles and rankings: https://www.ismcalifornia.org/\n\n**Other Resources**\n\n* **Great Schools:** Provides school ratings, reviews, and other information about public and private schools in California: https://www.greatschools.org/california/\n* **Niche:** Offers rankings and reviews of schools in California, including public, private, and charter schools: https://www.niche.com/k12/search/best-schools/s/california/\n* **US News & World Report:** Ranks high schools in California based on a variety of factors: https://www.usnews.com/best-high-schools/area/california\n\n**Tips for Choosing a School**\n\n* Consider your child's academic needs and goals.\n* Visit schools and talk to teachers and administrators to get a feel for the learning environment.\n* Read reviews and ratings from other parents and students.\n* Consider the school's location, size, and extracurricular activities.\n* Apply early to ensure your child's place in the desired school.",
+    "relevant_schools": [
+        "Local School",
+        "Tips for Choosing a School",
+        "Independent School",
+        "Private School"
+    ],
+    "filtered_ipeds_data": []
+}
